@@ -1,0 +1,119 @@
+@import "tailwindcss";
+@import "katex/dist/katex.min.css";
+
+:root {
+  --oc-bg-primary: #0a0a0b;
+  --oc-bg-secondary: #111113;
+  --oc-bg-tertiary: #1a1a1e;
+  --oc-bg-elevated: #222226;
+  --oc-bg-hover: #2a2a2e;
+  --oc-bg-active: #333338;
+
+  --oc-surface-primary: #161618;
+  --oc-surface-secondary: #1e1e22;
+  --oc-surface-tertiary: #262629;
+
+  --oc-text-primary: #ededef;
+  --oc-text-secondary: #a0a0a8;
+  --oc-text-tertiary: #6e6e78;
+  --oc-text-disabled: #4a4a52;
+
+  --oc-border-primary: #2a2a2e;
+  --oc-border-secondary: #222226;
+  --oc-border-focus: #5b5be6;
+
+  --oc-accent-primary: #5b5be6;
+  --oc-accent-hover: #6e6eef;
+  --oc-accent-text: #ffffff;
+
+  --oc-success: #34d399;
+  --oc-warning: #fbbf24;
+  --oc-error: #f87171;
+  --oc-info: #60a5fa;
+
+  --oc-diff-add-bg: rgba(52, 211, 153, 0.1);
+  --oc-diff-add-text: #34d399;
+  --oc-diff-del-bg: rgba(248, 113, 113, 0.1);
+  --oc-diff-del-text: #f87171;
+
+  --oc-syntax-keyword: #c678dd;
+  --oc-syntax-string: #98c379;
+  --oc-syntax-number: #d19a66;
+  --oc-syntax-function: #61afef;
+  --oc-syntax-comment: #5c6370;
+  --oc-syntax-variable: #e06c75;
+
+  --oc-font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --oc-font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+
+  --oc-radius-sm: 4px;
+  --oc-radius-md: 6px;
+  --oc-radius-lg: 8px;
+  --oc-radius-xl: 12px;
+
+  --oc-sidebar-width: 260px;
+  --oc-terminal-height: 300px;
+}
+
+[data-theme="light"] {
+  --oc-bg-primary: #ffffff;
+  --oc-bg-secondary: #f8f8fa;
+  --oc-bg-tertiary: #f0f0f4;
+  --oc-bg-elevated: #ffffff;
+  --oc-bg-hover: #e8e8ec;
+  --oc-bg-active: #dddde2;
+
+  --oc-surface-primary: #f4f4f8;
+  --oc-surface-secondary: #eeeef2;
+  --oc-surface-tertiary: #e4e4e8;
+
+  --oc-text-primary: #111113;
+  --oc-text-secondary: #555560;
+  --oc-text-tertiary: #888892;
+  --oc-text-disabled: #bbbbcc;
+
+  --oc-border-primary: #dddde2;
+  --oc-border-secondary: #e8e8ec;
+
+  --oc-syntax-comment: #a0a1a7;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--oc-font-sans);
+  background: var(--oc-bg-primary);
+  color: var(--oc-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--oc-border-primary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--oc-text-tertiary);
+}
