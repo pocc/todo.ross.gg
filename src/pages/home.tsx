@@ -1,4 +1,4 @@
-import { Component, createSignal, Show, For } from "solid-js"
+import { Component, createSignal, Show, For, createEffect } from "solid-js"
 import { useNavigate } from "@solidjs/router"
 import { useServer } from "~/context/server"
 import { Button } from "~/ui/components/button"
@@ -11,6 +11,10 @@ export const HomePage: Component = () => {
   const [dirInput, setDirInput] = createSignal("")
   const [showDirInput, setShowDirInput] = createSignal(false)
   const [connecting, setConnecting] = createSignal(false)
+  const [showSetup, setShowSetup] = createSignal(!server.connected)
+  const [copied, setCopied] = createSignal(false)
+
+  const serveCommand = () => `opencode serve --cors https://todo.ross.gg`
 
   async function handleConnect() {
     const url = urlInput().trim()
@@ -41,6 +45,16 @@ export const HomePage: Component = () => {
     navigate(`/${btoa(worktree)}/session`)
   }
 
+  async function copyCommand() {
+    try {
+      await navigator.clipboard.writeText(serveCommand())
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Clipboard API may fail
+    }
+  }
+
   function formatTime(iso: string): string {
     try {
       const d = new Date(iso)
@@ -54,6 +68,11 @@ export const HomePage: Component = () => {
       return ""
     }
   }
+
+  // Hide setup once connected
+  createEffect(() => {
+    if (server.connected) setShowSetup(false)
+  })
 
   return (
     <div
@@ -78,7 +97,6 @@ export const HomePage: Component = () => {
           "margin-bottom": "40px",
         }}
       >
-        {/* Logo icon area */}
         <div
           style={{
             width: "64px",
@@ -131,16 +149,262 @@ export const HomePage: Component = () => {
             }}
           />
           <span>
-            {server.connected ? "Connected" : "Disconnected"}
+            {server.connected ? "Connected" : "Not connected"}
           </span>
+          <Show when={!server.connected}>
+            <button
+              onClick={() => setShowSetup(!showSetup())}
+              style={{
+                background: "none",
+                border: "none",
+                color: "var(--oc-accent-primary)",
+                cursor: "pointer",
+                "font-size": "13px",
+                "text-decoration": "underline",
+                "text-underline-offset": "2px",
+                padding: "0",
+                "font-family": "var(--oc-font-sans)",
+              }}
+            >
+              {showSetup() ? "Hide setup" : "Setup guide"}
+            </button>
+          </Show>
         </div>
       </div>
+
+      {/* Setup Instructions */}
+      <Show when={showSetup() && !server.connected}>
+        <div
+          style={{
+            width: "100%",
+            "max-width": "520px",
+            "margin-bottom": "32px",
+            padding: "20px",
+            background: "var(--oc-surface-primary)",
+            border: "1px solid var(--oc-border-primary)",
+            "border-radius": "var(--oc-radius-lg)",
+          }}
+        >
+          <h3
+            style={{
+              "font-size": "14px",
+              "font-weight": "600",
+              color: "var(--oc-text-primary)",
+              "margin-bottom": "16px",
+            }}
+          >
+            Quick Start
+          </h3>
+
+          {/* Step 1 */}
+          <div style={{ "margin-bottom": "16px" }}>
+            <div
+              style={{
+                display: "flex",
+                "align-items": "center",
+                gap: "8px",
+                "margin-bottom": "8px",
+              }}
+            >
+              <span
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  "border-radius": "50%",
+                  background: "var(--oc-accent-primary)",
+                  color: "var(--oc-accent-text)",
+                  display: "flex",
+                  "align-items": "center",
+                  "justify-content": "center",
+                  "font-size": "11px",
+                  "font-weight": "700",
+                  "flex-shrink": "0",
+                }}
+              >
+                1
+              </span>
+              <span
+                style={{
+                  "font-size": "13px",
+                  color: "var(--oc-text-secondary)",
+                }}
+              >
+                Install OpenCode if you haven't already
+              </span>
+            </div>
+            <div
+              style={{
+                "margin-left": "28px",
+                padding: "8px 12px",
+                background: "var(--oc-bg-primary)",
+                "border-radius": "var(--oc-radius-md)",
+                border: "1px solid var(--oc-border-secondary)",
+                "font-family": "var(--oc-font-mono)",
+                "font-size": "12px",
+                color: "var(--oc-text-primary)",
+              }}
+            >
+              npm i -g opencode
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div style={{ "margin-bottom": "16px" }}>
+            <div
+              style={{
+                display: "flex",
+                "align-items": "center",
+                gap: "8px",
+                "margin-bottom": "8px",
+              }}
+            >
+              <span
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  "border-radius": "50%",
+                  background: "var(--oc-accent-primary)",
+                  color: "var(--oc-accent-text)",
+                  display: "flex",
+                  "align-items": "center",
+                  "justify-content": "center",
+                  "font-size": "11px",
+                  "font-weight": "700",
+                  "flex-shrink": "0",
+                }}
+              >
+                2
+              </span>
+              <span
+                style={{
+                  "font-size": "13px",
+                  color: "var(--oc-text-secondary)",
+                }}
+              >
+                Start the server with CORS enabled for this site
+              </span>
+            </div>
+            <div
+              style={{
+                "margin-left": "28px",
+                display: "flex",
+                "align-items": "center",
+                gap: "8px",
+              }}
+            >
+              <div
+                style={{
+                  flex: "1",
+                  padding: "8px 12px",
+                  background: "var(--oc-bg-primary)",
+                  "border-radius": "var(--oc-radius-md)",
+                  border: "1px solid var(--oc-border-secondary)",
+                  "font-family": "var(--oc-font-mono)",
+                  "font-size": "12px",
+                  color: "var(--oc-text-primary)",
+                  overflow: "hidden",
+                  "text-overflow": "ellipsis",
+                  "white-space": "nowrap",
+                }}
+              >
+                {serveCommand()}
+              </div>
+              <button
+                onClick={copyCommand}
+                title="Copy to clipboard"
+                style={{
+                  padding: "6px 10px",
+                  background: "var(--oc-bg-primary)",
+                  border: "1px solid var(--oc-border-secondary)",
+                  "border-radius": "var(--oc-radius-md)",
+                  color: copied() ? "var(--oc-success)" : "var(--oc-text-secondary)",
+                  cursor: "pointer",
+                  "font-size": "12px",
+                  "font-family": "var(--oc-font-sans)",
+                  "white-space": "nowrap",
+                  transition: "color 150ms ease",
+                }}
+              >
+                {copied() ? "Copied!" : "Copy"}
+              </button>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div style={{ "margin-bottom": "8px" }}>
+            <div
+              style={{
+                display: "flex",
+                "align-items": "center",
+                gap: "8px",
+                "margin-bottom": "4px",
+              }}
+            >
+              <span
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  "border-radius": "50%",
+                  background: "var(--oc-accent-primary)",
+                  color: "var(--oc-accent-text)",
+                  display: "flex",
+                  "align-items": "center",
+                  "justify-content": "center",
+                  "font-size": "11px",
+                  "font-weight": "700",
+                  "flex-shrink": "0",
+                }}
+              >
+                3
+              </span>
+              <span
+                style={{
+                  "font-size": "13px",
+                  color: "var(--oc-text-secondary)",
+                }}
+              >
+                Click Connect below (default: http://localhost:4096)
+              </span>
+            </div>
+          </div>
+
+          {/* Note about auth */}
+          <div
+            style={{
+              "margin-top": "16px",
+              "padding-top": "12px",
+              "border-top": "1px solid var(--oc-border-secondary)",
+              "font-size": "12px",
+              color: "var(--oc-text-tertiary)",
+              "line-height": "1.5",
+            }}
+          >
+            <strong style={{ color: "var(--oc-text-secondary)" }}>Optional:</strong>{" "}
+            Protect your server with a password:
+            <div
+              style={{
+                "margin-top": "6px",
+                padding: "6px 10px",
+                background: "var(--oc-bg-primary)",
+                "border-radius": "var(--oc-radius-md)",
+                border: "1px solid var(--oc-border-secondary)",
+                "font-family": "var(--oc-font-mono)",
+                "font-size": "11px",
+                color: "var(--oc-text-primary)",
+                "word-break": "break-all",
+              }}
+            >
+              OPENCODE_SERVER_PASSWORD=secret opencode serve --cors https://todo.ross.gg
+            </div>
+          </div>
+        </div>
+      </Show>
 
       {/* Server URL connect */}
       <div
         style={{
           width: "100%",
-          "max-width": "480px",
+          "max-width": "520px",
           "margin-bottom": "32px",
         }}
       >
@@ -208,7 +472,7 @@ export const HomePage: Component = () => {
       <div
         style={{
           width: "100%",
-          "max-width": "480px",
+          "max-width": "520px",
           "margin-bottom": "24px",
         }}
       >
@@ -240,7 +504,6 @@ export const HomePage: Component = () => {
           </Button>
         </div>
 
-        {/* Open directory input */}
         <Show when={showDirInput()}>
           <div
             style={{
@@ -279,7 +542,6 @@ export const HomePage: Component = () => {
           </div>
         </Show>
 
-        {/* Project list or empty state */}
         <Show
           when={server.projects.length > 0}
           fallback={
@@ -403,7 +665,7 @@ export const HomePage: Component = () => {
                         overflow: "hidden",
                         "text-overflow": "ellipsis",
                         "white-space": "nowrap",
-                        "max-width": "320px",
+                        "max-width": "360px",
                       }}
                     >
                       {project.worktree}

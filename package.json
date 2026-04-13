@@ -6,7 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "playwright test",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:mobile": "playwright test --project=mobile-chrome",
+    "test:prod": "BASE_URL=https://todo.ross.gg playwright test --project=chromium",
+    "test:headed": "playwright test --project=chromium --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --project=chromium --debug"
   },
   "dependencies": {
     "@kobalte/core": "^0.13.11",
@@ -38,5 +46,8 @@
     "vite": "^8.0.8",
     "vite-plugin-solid": "^2.11.12",
     "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
   }
 }
