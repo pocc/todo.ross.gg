@@ -53,6 +53,39 @@
 
   --oc-sidebar-width: 260px;
   --oc-terminal-height: 300px;
+
+  /* Cockpit theme colors (dark mode spaceship UI) */
+  --oc-cockpit-bg: #05060f;
+  --oc-cockpit-panel: #0c1020;
+  --oc-cockpit-panel-end: #080b15;
+  --oc-cockpit-surface: #060a18;
+  --oc-cockpit-panel-alt: #0e1225;
+  --oc-cockpit-panel-alt-end: #0a0d1a;
+  --oc-cockpit-frame: #1a1d2e;
+  --oc-cockpit-frame-end: #0c0f1a;
+  --oc-cockpit-frame-dark: #080a12;
+  --oc-cockpit-blue: rgba(40, 180, 255, 1);
+  --oc-cockpit-blue-muted: rgba(100, 160, 220, 1);
+  --oc-cockpit-blue-glow: rgba(60, 140, 220, 1);
+  --oc-cockpit-text: rgba(140, 180, 220, 0.6);
+  --oc-cockpit-text-muted: rgba(140, 180, 220, 0.45);
+  --oc-cockpit-text-faint: rgba(100, 150, 200, 0.35);
+  --oc-cockpit-text-dim: rgba(100, 150, 200, 0.3);
+  --oc-cockpit-border: rgba(80, 140, 200, 0.3);
+  --oc-cockpit-border-bright: rgba(80, 160, 255, 0.5);
+  --oc-cockpit-border-muted: rgba(40, 100, 200, 0.25);
+  --oc-cockpit-border-faint: rgba(60, 100, 160, 0.15);
+  --oc-cockpit-input-text: #c8ddf0;
+  --oc-cockpit-green: #4ade80;
+  --oc-cockpit-yellow: #facc15;
+  --oc-cockpit-warn: rgba(250, 200, 50, 0.6);
+  --oc-cockpit-red: hsl(0, 45%, 30%);
+  --oc-cockpit-red-bright: hsl(0, 50%, 45%);
+  --oc-cockpit-red-border: hsl(0, 30%, 22%);
+  --oc-cockpit-red-shadow: hsl(0, 30%, 20%);
+  --oc-cockpit-control-bg: #1a1f2e;
+  --oc-cockpit-dial-bg: #0f1320;
+  --oc-cockpit-highlight: #e0f0ff;
 }
 
 [data-theme="light"] {
@@ -121,6 +154,62 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--oc-text-tertiary);
+}
+
+/* Cockpit-themed sidebar in dark mode on session page */
+.cockpit-sidebar {
+  background: linear-gradient(180deg, var(--oc-cockpit-panel) 0%, var(--oc-cockpit-panel-end) 100%) !important;
+  border-right-color: var(--oc-cockpit-border-muted) !important;
+}
+.cockpit-sidebar .sidebar-header {
+  border-bottom-color: var(--oc-cockpit-border-faint) !important;
+}
+.cockpit-sidebar .sidebar-filter {
+  background: var(--oc-cockpit-surface) !important;
+  border-color: var(--oc-cockpit-border-muted) !important;
+}
+.cockpit-sidebar .sidebar-section-border {
+  border-color: var(--oc-cockpit-border-faint) !important;
+}
+
+/* Responsive cockpit layout */
+@media (max-width: 900px) {
+  .cockpit-side-controls {
+    display: none !important;
+  }
+  .cockpit-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .cockpit-extra-controls {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .cockpit-viewport {
+    flex: 0 0 25% !important;
+    min-height: 120px !important;
+  }
+  .cockpit-instruments {
+    grid-template-columns: 1fr !important;
+  }
+  /* Auto-collapse sidebar on narrow viewports */
+  .app-sidebar {
+    display: none !important;
+  }
+  .app-sidebar-collapsed {
+    display: none !important;
+  }
+  .app-sidebar-resize {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .cockpit-viewport {
+    flex: 0 0 20% !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

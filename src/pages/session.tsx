@@ -59,7 +59,7 @@ const ShipLog: Component = () => {
     <div
       style={{
         "font-family": "var(--oc-font-mono)",
-        "font-size": "8px",
+        "font-size": "10px",
         color: "rgba(80, 200, 120, 0.55)",
         "line-height": "1.6",
         "white-space": "nowrap",
@@ -88,13 +88,13 @@ const SendButton: Component<{
         ? props.dark
           ? "linear-gradient(180deg, rgba(50, 130, 220, 0.8) 0%, rgba(40, 100, 180, 0.8) 100%)"
           : "var(--oc-accent-primary)"
-        : props.dark ? "rgba(50, 80, 120, 0.15)" : "var(--oc-bg-tertiary)",
+        : props.dark ? "rgba(50, 80, 120, 0.25)" : "var(--oc-bg-tertiary)",
       color: props.hasText
-        ? props.dark ? "#e0f0ff" : "#fff"
-        : props.dark ? "rgba(100, 150, 200, 0.3)" : "var(--oc-text-disabled)",
+        ? props.dark ? "var(--oc-cockpit-highlight)" : "#fff"
+        : props.dark ? "rgba(100, 150, 200, 0.5)" : "var(--oc-text-disabled)",
       border: props.hasText
         ? props.dark ? "1px solid rgba(80, 160, 255, 0.3)" : "1px solid var(--oc-accent-primary)"
-        : props.dark ? "1px solid rgba(60, 100, 160, 0.1)" : "1px solid var(--oc-border-primary)",
+        : props.dark ? "1px solid rgba(60, 100, 160, 0.25)" : "1px solid var(--oc-border-primary)",
       "border-radius": props.dark ? "4px" : "8px",
       "font-size": "11px",
       "font-weight": "600",
@@ -262,32 +262,35 @@ const EmptySession: Component = () => {
         style={{
           width: "100%",
           height: "100%",
-          overflow: "hidden",
-          background: "#05060f",
+          "overflow-y": "auto",
+          "overflow-x": "hidden",
+          background: "var(--oc-cockpit-bg)",
           display: "flex",
           "flex-direction": "column",
+          "scrollbar-width": "thin",
         }}
       >
-        {/* Viewport — ISS feed, top 40% with matching side margins */}
+        {/* Viewport — ISS feed, top portion */}
         <div
+          class="cockpit-viewport"
           style={{
             position: "relative",
-            flex: "0 0 40%",
+            flex: "0 0 35%",
+            "min-height": "160px",
             overflow: "hidden",
             padding: "0 16px",
           }}
         >
-          <div style={{ position: "relative", width: "100%", height: "100%", "max-width": "800px", margin: "0 auto", overflow: "hidden", "border-radius": "0 0 4px 4px" }}>
+          <div style={{ position: "relative", width: "100%", height: "100%", "max-width": "900px", margin: "0 auto", overflow: "hidden", "border-radius": "0 0 4px 4px" }}>
             <SpaceViewport />
           </div>
         </div>
 
-        {/* Control panel — fills remaining 2/3, textbox surrounded by controls */}
+        {/* Control panel — textbox surrounded by controls */}
         <div
           style={{
-            flex: "1",
-            "min-height": "0",
-            background: "linear-gradient(180deg, #0c1020 0%, #080b15 100%)",
+            flex: "1 0 auto",
+            background: `linear-gradient(180deg, var(--oc-cockpit-panel) 0%, var(--oc-cockpit-panel-end) 100%)`,
             padding: "0 16px 12px",
             display: "flex",
             "flex-direction": "column",
@@ -301,15 +304,15 @@ const EmptySession: Component = () => {
               "align-items": "center",
               "justify-content": "space-between",
               width: "100%",
-              "max-width": "800px",
+              "max-width": "900px",
               padding: "0 4px 6px",
             }}
           >
             <div style={{ display: "flex", "align-items": "center", gap: "16px" }}>
               {[
-                { label: "COMM", color: "#4ade80" },
-                { label: "NAV", color: "#4ade80" },
-                { label: "SHIELD", color: "#facc15" },
+                { label: "COMM", color: "var(--oc-cockpit-green)" },
+                { label: "NAV", color: "var(--oc-cockpit-green)" },
+                { label: "SHIELD", color: "var(--oc-cockpit-yellow)" },
               ].map((ind) => (
                 <div style={{ display: "flex", "align-items": "center", gap: "5px" }}>
                   <div
@@ -324,8 +327,8 @@ const EmptySession: Component = () => {
                   <span
                     style={{
                       "font-family": "var(--oc-font-mono)",
-                      "font-size": "9px",
-                      color: "rgba(140, 180, 220, 0.6)",
+                      "font-size": "10px",
+                      color: "var(--oc-cockpit-text)",
                       "letter-spacing": "1px",
                       "text-transform": "uppercase",
                     }}
@@ -338,8 +341,8 @@ const EmptySession: Component = () => {
             <span
               style={{
                 "font-family": "var(--oc-font-mono)",
-                "font-size": "9px",
-                color: "rgba(140, 180, 220, 0.5)",
+                "font-size": "10px",
+                color: "var(--oc-cockpit-text-muted)",
                 "letter-spacing": "1px",
               }}
             >
@@ -349,18 +352,20 @@ const EmptySession: Component = () => {
 
           {/* Grid: left controls | textbox | right controls */}
           <div
+            class="cockpit-grid"
             style={{
               display: "grid",
-              "grid-template-columns": "minmax(100px, 1fr) minmax(300px, 3fr) minmax(100px, 1fr)",
+              "grid-template-columns": "minmax(100px, 1fr) minmax(280px, 3fr) minmax(100px, 1fr)",
               gap: "16px",
               width: "100%",
-              "max-width": "800px",
+              "max-width": "900px",
               "align-items": "center",
             }}
-            aria-hidden="true"
           >
             {/* Left controls */}
             <div
+              class="cockpit-side-controls"
+              aria-hidden="true"
               style={{
                 display: "flex",
                 "flex-direction": "column",
@@ -373,19 +378,21 @@ const EmptySession: Component = () => {
               <NumberDial name="Hypnobellows" />
             </div>
 
-            {/* Center textbox */}
+            {/* Center textbox — hero element */}
             <div
               style={{
                 background: "rgba(8, 12, 25, 0.95)",
                 border: focused()
-                  ? "1px solid rgba(80, 160, 255, 0.5)"
-                  : "1px solid rgba(80, 140, 200, 0.3)",
+                  ? "1px solid var(--oc-cockpit-border-bright)"
+                  : "1px solid var(--oc-cockpit-border)",
                 "border-radius": "10px",
                 overflow: "hidden",
                 "box-shadow": focused()
-                  ? "0 0 30px rgba(60, 140, 220, 0.2), inset 0 1px 0 rgba(80, 140, 200, 0.15)"
-                  : "0 0 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(80, 140, 200, 0.08)",
+                  ? "0 0 40px rgba(60, 140, 220, 0.25), inset 0 1px 0 rgba(80, 140, 200, 0.15), 0 0 0 1px rgba(80, 160, 255, 0.1)"
+                  : "0 0 20px rgba(60, 140, 220, 0.1), inset 0 1px 0 rgba(80, 140, 200, 0.08)",
                 transition: "border-color 200ms ease, box-shadow 200ms ease",
+                position: "relative",
+                "z-index": "1",
               }}
             >
               <textarea
@@ -403,7 +410,7 @@ const EmptySession: Component = () => {
                   padding: "14px 16px",
                   background: "transparent",
                   border: "none",
-                  color: "#c8ddf0",
+                  color: "var(--oc-cockpit-input-text)",
                   "font-size": "14px",
                   "font-family": "var(--oc-font-mono)",
                   "line-height": "1.5",
@@ -417,18 +424,23 @@ const EmptySession: Component = () => {
                   "align-items": "center",
                   "justify-content": "space-between",
                   padding: "5px 12px",
-                  "border-top": "1px solid rgba(60, 100, 160, 0.15)",
+                  "border-top": `1px solid var(--oc-cockpit-border-faint)`,
+                  gap: "8px",
                 }}
               >
                 <span
                   style={{
                     "font-size": "10px",
                     "font-family": "var(--oc-font-mono)",
-                    color: "rgba(100, 150, 200, 0.35)",
+                    color: "var(--oc-cockpit-text-faint)",
                     "letter-spacing": "0.5px",
+                    "white-space": "nowrap",
+                    overflow: "hidden",
+                    "text-overflow": "ellipsis",
+                    "min-width": "0",
                   }}
                 >
-                  ENTER to transmit / SHIFT+ENTER newline
+                  ENTER transmit &middot; SHIFT+ENTER newline
                 </span>
                 <SendButton hasText={!!text().trim()} sending={sending()} onSend={handleSend} dark={true} />
               </div>
@@ -436,6 +448,8 @@ const EmptySession: Component = () => {
 
             {/* Right controls */}
             <div
+              class="cockpit-side-controls"
+              aria-hidden="true"
               style={{
                 display: "flex",
                 "flex-direction": "column",
@@ -450,15 +464,16 @@ const EmptySession: Component = () => {
           </div>
 
           {/* Bottom controls strip */}
-          <div style={{ width: "100%", "max-width": "800px", "margin-top": "8px" }}>
+          <div style={{ width: "100%", "max-width": "900px", "margin-top": "8px" }}>
             <SpaceteamPanel />
           </div>
 
           {/* Dashboard instruments + Ship's log */}
           <div
+            class="cockpit-instruments"
             style={{
               width: "100%",
-              "max-width": "800px",
+              "max-width": "900px",
               "margin-top": "8px",
               display: "grid",
               "grid-template-columns": "1fr 1fr 1fr",
@@ -469,8 +484,8 @@ const EmptySession: Component = () => {
             {/* Left — Radar screen */}
             <div
               style={{
-                background: "#060a18",
-                border: "1px solid rgba(40, 100, 200, 0.25)",
+                background: "var(--oc-cockpit-surface)",
+                border: `1px solid var(--oc-cockpit-border-muted)`,
                 "border-radius": "6px",
                 padding: "6px",
                 "min-height": "90px",
@@ -480,7 +495,7 @@ const EmptySession: Component = () => {
             >
               <div style={{
                 "font-family": "var(--oc-font-mono)",
-                "font-size": "7px",
+                "font-size": "10px",
                 color: "rgba(40, 180, 255, 0.4)",
                 "letter-spacing": "1.5px",
                 "text-transform": "uppercase",
@@ -500,8 +515,8 @@ const EmptySession: Component = () => {
             {/* Center — Ship's log terminal */}
             <div
               style={{
-                background: "#060a18",
-                border: "1px solid rgba(40, 100, 200, 0.25)",
+                background: "var(--oc-cockpit-surface)",
+                border: `1px solid var(--oc-cockpit-border-muted)`,
                 "border-radius": "6px",
                 padding: "6px",
                 "min-height": "90px",
@@ -510,7 +525,7 @@ const EmptySession: Component = () => {
             >
               <div style={{
                 "font-family": "var(--oc-font-mono)",
-                "font-size": "7px",
+                "font-size": "10px",
                 color: "rgba(40, 180, 255, 0.4)",
                 "letter-spacing": "1.5px",
                 "text-transform": "uppercase",
@@ -522,8 +537,8 @@ const EmptySession: Component = () => {
             {/* Right — Gauges + red buttons */}
             <div
               style={{
-                background: "#060a18",
-                border: "1px solid rgba(40, 100, 200, 0.25)",
+                background: "var(--oc-cockpit-surface)",
+                border: `1px solid var(--oc-cockpit-border-muted)`,
                 "border-radius": "6px",
                 padding: "6px",
                 "min-height": "90px",
@@ -532,21 +547,19 @@ const EmptySession: Component = () => {
             >
               <div style={{
                 "font-family": "var(--oc-font-mono)",
-                "font-size": "7px",
+                "font-size": "10px",
                 color: "rgba(40, 180, 255, 0.4)",
                 "letter-spacing": "1.5px",
                 "text-transform": "uppercase",
                 "margin-bottom": "4px",
               }}>AUX CONTROL</div>
               <svg viewBox="0 0 100 70" style={{ width: "100%", height: "auto" }}>
-                {/* Gauges */}
                 <circle cx="25" cy="22" r="12" fill="none" stroke="rgba(80, 140, 200, 0.2)" stroke-width="0.8" />
                 <circle cx="25" cy="22" r="3" fill="rgba(80, 160, 220, 0.1)" />
                 <line x1="25" y1="22" x2="33" y2="16" stroke="rgba(200, 100, 100, 0.4)" stroke-width="0.8" />
                 <circle cx="75" cy="22" r="12" fill="none" stroke="rgba(80, 140, 200, 0.2)" stroke-width="0.8" />
                 <circle cx="75" cy="22" r="3" fill="rgba(80, 160, 220, 0.1)" />
                 <line x1="75" y1="22" x2="68" y2="14" stroke="rgba(200, 100, 100, 0.4)" stroke-width="0.8" />
-                {/* Red button grid */}
                 {[0,1,2,3].map((i) =>
                   [0,1].map((j) => (
                     <rect
@@ -567,9 +580,10 @@ const EmptySession: Component = () => {
 
           {/* Extra controls row */}
           <div
+            class="cockpit-extra-controls"
             style={{
               width: "100%",
-              "max-width": "800px",
+              "max-width": "900px",
               "margin-top": "8px",
               display: "flex",
               "align-items": "flex-end",
@@ -701,6 +715,14 @@ const SessionContent: Component = () => {
           isRunning={isRunning()}
           onSubmit={handleSendMessage}
           onAbort={handleAbort}
+          onModelSelect={async (provider, model) => {
+            try {
+              await server.sdk.updateSession(params.id, { model: { provider, model } } as Partial<Session>)
+              globalSync.refreshSessions()
+            } catch {
+              // model update failed
+            }
+          }}
         />
       </div>
 

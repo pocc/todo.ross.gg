@@ -122,6 +122,7 @@ export const AppLayout: Component<{ children?: any }> = (props) => {
       {/* Sidebar */}
       <Show when={!layout.layout.sidebarCollapsed}>
         <div
+          class="app-sidebar"
           style={{
             width: `${layout.layout.sidebarWidth}px`,
             "flex-shrink": "0",
@@ -132,6 +133,7 @@ export const AppLayout: Component<{ children?: any }> = (props) => {
           <Sidebar />
           {/* Sidebar resize handle */}
           <div
+            class="app-sidebar-resize"
             onMouseDown={handleSidebarDragStart}
             style={{
               position: "absolute",
@@ -155,6 +157,7 @@ export const AppLayout: Component<{ children?: any }> = (props) => {
       {/* Collapsed sidebar toggle */}
       <Show when={layout.layout.sidebarCollapsed}>
         <div
+          class="app-sidebar-collapsed"
           style={{
             width: "40px",
             "flex-shrink": "0",
@@ -224,7 +227,7 @@ export const AppLayout: Component<{ children?: any }> = (props) => {
           style={{
             flex: "1",
             "min-height": "0",
-            overflow: "hidden",
+            overflow: "auto",
           }}
         >
           {props.children}

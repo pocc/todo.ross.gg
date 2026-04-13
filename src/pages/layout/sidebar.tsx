@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "@solidjs/router"
 import { useServer } from "~/context/server"
 import { useGlobalSync } from "~/context/global-sync"
 import { useLayout } from "~/context/layout"
+import { useTheme } from "~/ui/theme"
 import { Button } from "~/ui/components/button"
 import { Spinner } from "~/ui/components/spinner"
 import { ThemeToggle } from "~/components/theme-toggle"
@@ -13,7 +14,9 @@ export const Sidebar: Component = () => {
   const server = useServer()
   const globalSync = useGlobalSync()
   const layout = useLayout()
+  const theme = useTheme()
 
+  const isDark = () => theme.resolvedMode() === "dark"
   const [filter, setFilter] = createSignal("")
   const [creating, setCreating] = createSignal(false)
 
@@ -91,6 +94,7 @@ export const Sidebar: Component = () => {
 
   return (
     <div
+      class={isDark() ? "cockpit-sidebar" : ""}
       style={{
         display: "flex",
         "flex-direction": "column",
@@ -102,6 +106,7 @@ export const Sidebar: Component = () => {
     >
       {/* Project header */}
       <div
+        class="sidebar-header"
         style={{
           padding: "12px 12px 8px",
           "border-bottom": "1px solid var(--oc-border-secondary)",
@@ -180,6 +185,7 @@ export const Sidebar: Component = () => {
           type="text"
           value={filter()}
           onInput={(e) => setFilter(e.currentTarget.value)}
+          class="sidebar-filter"
           placeholder="Filter sessions..."
           aria-label="Filter sessions"
           style={{
@@ -313,6 +319,7 @@ export const Sidebar: Component = () => {
 
       {/* Collapse button */}
       <div
+        class="sidebar-section-border"
         style={{
           padding: "8px 12px",
           "border-top": "1px solid var(--oc-border-secondary)",

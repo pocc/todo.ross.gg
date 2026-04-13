@@ -15,14 +15,45 @@ export const SpaceViewport: Component = () => {
       }}
       aria-hidden="true"
     >
-      {/* Starfield fallback behind iframe */}
+      {/* Starfield fallback behind iframe — animated subtle stars */}
       <div
         style={{
           position: "absolute",
           inset: "0",
           background: "radial-gradient(ellipse at 40% 30%, #0d1030 0%, #050810 50%, #020408 100%)",
         }}
-      />
+      >
+        {/* Static star dots for when the stream doesn't load */}
+        <svg
+          viewBox="0 0 400 200"
+          preserveAspectRatio="xMidYMid slice"
+          style={{ position: "absolute", inset: "0", width: "100%", height: "100%", opacity: "0.8" }}
+        >
+          {/* Brighter stars */}
+          <circle cx="45" cy="30" r="1.2" fill="rgba(200, 220, 255, 0.7)" />
+          <circle cx="120" cy="55" r="0.8" fill="rgba(200, 220, 255, 0.5)" />
+          <circle cx="200" cy="20" r="1.0" fill="rgba(200, 220, 255, 0.6)" />
+          <circle cx="280" cy="70" r="0.9" fill="rgba(180, 200, 255, 0.5)" />
+          <circle cx="350" cy="35" r="1.1" fill="rgba(200, 220, 255, 0.6)" />
+          <circle cx="70" cy="120" r="0.7" fill="rgba(200, 220, 255, 0.4)" />
+          <circle cx="160" cy="140" r="1.0" fill="rgba(200, 220, 255, 0.5)" />
+          <circle cx="240" cy="160" r="0.8" fill="rgba(180, 200, 255, 0.4)" />
+          <circle cx="310" cy="110" r="0.6" fill="rgba(200, 220, 255, 0.3)" />
+          <circle cx="380" cy="150" r="0.9" fill="rgba(200, 220, 255, 0.5)" />
+          {/* Dimmer stars */}
+          <circle cx="30" cy="80" r="0.5" fill="rgba(160, 180, 220, 0.25)" />
+          <circle cx="90" cy="170" r="0.4" fill="rgba(160, 180, 220, 0.2)" />
+          <circle cx="145" cy="95" r="0.5" fill="rgba(160, 180, 220, 0.25)" />
+          <circle cx="210" cy="110" r="0.4" fill="rgba(160, 180, 220, 0.2)" />
+          <circle cx="260" cy="45" r="0.5" fill="rgba(160, 180, 220, 0.25)" />
+          <circle cx="330" cy="85" r="0.4" fill="rgba(160, 180, 220, 0.2)" />
+          <circle cx="375" cy="175" r="0.5" fill="rgba(160, 180, 220, 0.25)" />
+          <circle cx="15" cy="150" r="0.4" fill="rgba(160, 180, 220, 0.2)" />
+          {/* Faint nebula glow */}
+          <circle cx="180" cy="80" r="40" fill="rgba(30, 50, 120, 0.08)" />
+          <circle cx="300" cy="130" r="30" fill="rgba(60, 30, 80, 0.05)" />
+        </svg>
+      </div>
 
       {/* ISS live feed */}
       <iframe
@@ -41,7 +72,7 @@ export const SpaceViewport: Component = () => {
         tabIndex={-1}
       />
 
-      {/* Cockpit frame — two beams converging inward */}
+      {/* Cockpit frame — curved windshield beams */}
       <svg
         viewBox="0 0 1000 500"
         preserveAspectRatio="none"
@@ -56,34 +87,33 @@ export const SpaceViewport: Component = () => {
       >
         <defs>
           <linearGradient id="frameGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#1a1d2e" />
-            <stop offset="50%" stop-color="#0c0f1a" />
-            <stop offset="100%" stop-color="#080a12" />
+            <stop offset="0%" stop-color="var(--oc-cockpit-frame)" />
+            <stop offset="50%" stop-color="var(--oc-cockpit-frame-end)" />
+            <stop offset="100%" stop-color="var(--oc-cockpit-frame-dark)" />
           </linearGradient>
         </defs>
 
         {/* Outer frame */}
         <rect x="0" y="0" width="1000" height="500" fill="url(#frameGrad)" />
 
-        {/* Main viewport cutout — full rectangle */}
+        {/* Main viewport cutout */}
         <rect x="15" y="12" width="970" height="476" fill="black" fill-opacity="1" />
-        {/* Re-fill the cutout with transparent to reveal iframe behind */}
         <rect x="15" y="12" width="970" height="476" fill="transparent" />
 
-        {/* Left beam — angling from top-left inward to bottom-center */}
-        <polygon
-          points="200,12 230,12 420,488 390,488"
+        {/* Left beam — curved arc from top-left inward to bottom-center */}
+        <path
+          d="M200,12 L230,12 Q380,250 420,488 L390,488 Q350,250 200,12 Z"
           fill="url(#frameGrad)"
         />
-        {/* Right beam — angling from top-right inward to bottom-center */}
-        <polygon
-          points="770,12 800,12 610,488 580,488"
+        {/* Right beam — curved arc from top-right inward to bottom-center */}
+        <path
+          d="M770,12 L800,12 Q650,250 610,488 L580,488 Q620,250 770,12 Z"
           fill="url(#frameGrad)"
         />
 
-        {/* Beam edge highlights */}
-        <line x1="215" y1="12" x2="405" y2="488" stroke="rgba(100, 160, 220, 0.15)" stroke-width="1.5" />
-        <line x1="785" y1="12" x2="595" y2="488" stroke="rgba(100, 160, 220, 0.15)" stroke-width="1.5" />
+        {/* Beam edge highlights — curved */}
+        <path d="M215,12 Q365,250 405,488" fill="none" stroke="rgba(100, 160, 220, 0.15)" stroke-width="1.5" />
+        <path d="M785,12 Q635,250 595,488" fill="none" stroke="rgba(100, 160, 220, 0.15)" stroke-width="1.5" />
 
         {/* Frame border highlights */}
         <rect x="15" y="12" width="970" height="476" fill="none" stroke="rgba(80, 140, 200, 0.2)" stroke-width="2" />
@@ -97,13 +127,13 @@ export const SpaceViewport: Component = () => {
         ].map(([cx, cy]) => (
           <>
             <circle cx={cx} cy={cy} r="4" fill="#1a1f30" />
-            <circle cx={cx} cy={cy} r="2.5" fill="#0c0f1a" />
+            <circle cx={cx} cy={cy} r="2.5" fill="var(--oc-cockpit-frame-end)" />
             <circle cx={cx} cy={cy} r="1" fill="rgba(100, 160, 220, 0.15)" />
           </>
         ))}
 
         {/* HULL INTEGRITY on top frame */}
-        <text x="500" y="8" text-anchor="middle" font-family="var(--oc-font-mono)" font-size="7" fill="rgba(100, 160, 220, 0.2)" letter-spacing="3">
+        <text x="500" y="8" text-anchor="middle" font-family="var(--oc-font-mono)" font-size="8" fill="rgba(100, 160, 220, 0.25)" letter-spacing="3">
           HULL INTEGRITY 98.7%
         </text>
       </svg>
@@ -157,7 +187,7 @@ export const SpaceViewport: Component = () => {
             top: "6%",
             left: "50%",
             transform: "translateX(-50%)",
-            "font-size": "8px",
+            "font-size": "10px",
             color: "rgba(100, 180, 255, 0.2)",
             "letter-spacing": "2px",
           }}

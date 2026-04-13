@@ -58,8 +58,8 @@ export const ActionButton: Component<{ name: string; verb: string }> = (props) =
     >
       <span
         style={{
-          "font-size": "8px",
-          color: "rgba(140, 180, 220, 0.45)",
+          "font-size": "10px",
+          color: "var(--oc-cockpit-text-muted)",
           "letter-spacing": "0.5px",
           "text-transform": "uppercase",
           "text-align": "center",
@@ -112,8 +112,8 @@ export const ToggleSwitch: Component<{ name: string }> = (props) => {
     >
       <span
         style={{
-          "font-size": "8px",
-          color: "rgba(140, 180, 220, 0.45)",
+          "font-size": "10px",
+          color: "var(--oc-cockpit-text-muted)",
           "letter-spacing": "0.5px",
           "text-transform": "uppercase",
           "text-align": "center",
@@ -128,7 +128,7 @@ export const ToggleSwitch: Component<{ name: string }> = (props) => {
         onClick={() => setOn(!on())}
         style={{
           padding: "3px 8px",
-          background: "#1a1f2e",
+          background: "var(--oc-cockpit-control-bg)",
           border: "2px solid rgba(80, 120, 160, 0.3)",
           "border-radius": "3px",
           "font-family": "var(--oc-font-mono)",
@@ -163,8 +163,8 @@ export const NumberDial: Component<{ name: string }> = (props) => {
     >
       <span
         style={{
-          "font-size": "8px",
-          color: "rgba(140, 180, 220, 0.45)",
+          "font-size": "10px",
+          color: "var(--oc-cockpit-text-muted)",
           "letter-spacing": "0.5px",
           "text-transform": "uppercase",
           "text-align": "center",
@@ -187,7 +187,7 @@ export const NumberDial: Component<{ name: string }> = (props) => {
           style={{
             width: "22px",
             height: "22px",
-            background: "#1a1f2e",
+            background: "var(--oc-cockpit-control-bg)",
             border: "1px solid rgba(80, 120, 160, 0.3)",
             "border-radius": "2px 0 0 2px",
             color: "rgba(140, 180, 220, 0.6)",
@@ -205,7 +205,7 @@ export const NumberDial: Component<{ name: string }> = (props) => {
           style={{
             width: "28px",
             height: "22px",
-            background: "#0f1320",
+            background: "var(--oc-cockpit-dial-bg)",
             "border-top": "1px solid rgba(80, 120, 160, 0.3)",
             "border-bottom": "1px solid rgba(80, 120, 160, 0.3)",
             display: "flex",
@@ -214,7 +214,7 @@ export const NumberDial: Component<{ name: string }> = (props) => {
             "font-family": "var(--oc-font-mono)",
             "font-size": "11px",
             "font-weight": "700",
-            color: "#e0f0ff",
+            color: "var(--oc-cockpit-highlight)",
           }}
         >
           {value()}
@@ -225,7 +225,7 @@ export const NumberDial: Component<{ name: string }> = (props) => {
           style={{
             width: "22px",
             height: "22px",
-            background: "#1a1f2e",
+            background: "var(--oc-cockpit-control-bg)",
             border: "1px solid rgba(80, 120, 160, 0.3)",
             "border-radius": "0 2px 2px 0",
             color: "rgba(140, 180, 220, 0.6)",
@@ -275,8 +275,8 @@ export const Slider: Component<{ name: string }> = (props) => {
     >
       <span
         style={{
-          "font-size": "8px",
-          color: "rgba(140, 180, 220, 0.45)",
+          "font-size": "10px",
+          color: "var(--oc-cockpit-text-muted)",
           "letter-spacing": "0.5px",
           "text-transform": "uppercase",
           "text-align": "center",
@@ -289,11 +289,11 @@ export const Slider: Component<{ name: string }> = (props) => {
       <div
         style={{
           padding: "3px 6px",
-          background: "#0f1320",
+          background: "var(--oc-cockpit-dial-bg)",
           border: "1px solid rgba(80, 120, 160, 0.25)",
           "border-radius": "2px",
           "font-family": "var(--oc-font-mono)",
-          "font-size": "9px",
+          "font-size": "10px",
           color: "rgba(100, 200, 255, 0.6)",
           "letter-spacing": "0",
           "white-space": "nowrap",
@@ -354,7 +354,7 @@ export const SpaceteamPanel: Component = () => {
         <span
           style={{
             "font-family": "var(--oc-font-mono)",
-            "font-size": "8px",
+            "font-size": "10px",
             color: "rgba(100, 150, 200, 0.3)",
             "letter-spacing": "2px",
             "text-transform": "uppercase",
@@ -397,9 +397,9 @@ export const SpaceteamPanel: Component = () => {
         <span
           style={{
             "font-family": "var(--oc-font-mono)",
-            "font-size": "9px",
+            "font-size": "10px",
             "font-weight": "700",
-            color: "rgba(250, 200, 50, 0.6)",
+            color: "var(--oc-cockpit-warn)",
             "letter-spacing": "1px",
           }}
         >
