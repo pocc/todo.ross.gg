@@ -335,7 +335,6 @@ export const SpaceteamPanel: Component = () => {
         "border-top": "1px solid rgba(80, 140, 200, 0.2)",
         "border-bottom": "1px solid rgba(80, 140, 200, 0.15)",
         position: "relative",
-        overflow: "hidden",
       }}
     >
       {/* Panel accent line */}
@@ -376,9 +375,10 @@ export const SpaceteamPanel: Component = () => {
           "align-items": "flex-end",
           "justify-content": "space-around",
           padding: "6px 16px 8px",
-          gap: "8px",
-          "flex-wrap": "wrap",
+          gap: "12px",
+          "overflow-x": "auto",
           "min-height": "52px",
+          "scrollbar-width": "none",
         }}
       >
         <For each={controls()}>
@@ -395,8 +395,7 @@ export const SpaceteamPanel: Component = () => {
       <div
         style={{
           "text-align": "center",
-          padding: "0 0 6px",
-          height: "14px",
+          padding: "2px 0 8px",
         }}
       >
         <span

@@ -386,12 +386,12 @@ export const SpaceViewport: Component = () => {
   })
 
   // Cockpit frame as SVG overlay with 3 viewport cutouts
-  // Coordinates are in percentages mapped to viewBox 0 0 1000 600
+  // ViewBox 0 0 1000 600 — windows extend nearly full height
   const framePath = `
     M 0 0 H 1000 V 600 H 0 Z
-    M 60 50 L 320 80 L 350 400 L 40 350 Z
-    M 370 30 L 630 30 L 680 400 L 320 400 Z
-    M 680 80 L 940 50 L 960 350 L 650 400 Z
+    M 50 40 L 310 65 L 330 560 L 30 530 Z
+    M 355 25 L 645 25 L 670 560 L 330 560 Z
+    M 670 65 L 950 40 L 970 530 L 650 560 Z
   `
 
   return (
@@ -437,37 +437,35 @@ export const SpaceViewport: Component = () => {
         {/* Viewport edge highlights — subtle glow along window frames */}
         {/* Left viewport */}
         <polygon
-          points="60,50 320,80 350,400 40,350"
+          points="50,40 310,65 330,560 30,530"
           fill="none"
           stroke="rgba(80, 140, 200, 0.2)"
           stroke-width="2"
         />
         {/* Center viewport */}
         <polygon
-          points="370,30 630,30 680,400 320,400"
+          points="355,25 645,25 670,560 330,560"
           fill="none"
           stroke="rgba(80, 140, 200, 0.25)"
           stroke-width="2.5"
         />
         {/* Right viewport */}
         <polygon
-          points="680,80 940,50 960,350 650,400"
+          points="670,65 950,40 970,530 650,560"
           fill="none"
           stroke="rgba(80, 140, 200, 0.2)"
           stroke-width="2"
         />
 
         {/* Structural beam highlights — bright edges on the frame dividers */}
-        <line x1="320" y1="80" x2="320" y2="400" stroke="rgba(100, 160, 220, 0.12)" stroke-width="1" />
-        <line x1="350" y1="400" x2="320" y2="400" stroke="rgba(100, 160, 220, 0.1)" stroke-width="1" />
-        <line x1="680" y1="80" x2="650" y2="400" stroke="rgba(100, 160, 220, 0.12)" stroke-width="1" />
-        <line x1="680" y1="400" x2="650" y2="400" stroke="rgba(100, 160, 220, 0.1)" stroke-width="1" />
+        <line x1="310" y1="65" x2="330" y2="560" stroke="rgba(100, 160, 220, 0.12)" stroke-width="1" />
+        <line x1="670" y1="65" x2="650" y2="560" stroke="rgba(100, 160, 220, 0.12)" stroke-width="1" />
 
         {/* Rivet/bolt dots at beam intersections */}
         {[
-          [60, 50], [320, 80], [350, 400], [40, 350],
-          [370, 30], [630, 30], [680, 400], [320, 400],
-          [680, 80], [940, 50], [960, 350], [650, 400],
+          [50, 40], [310, 65], [330, 560], [30, 530],
+          [355, 25], [645, 25], [670, 560], [330, 560],
+          [670, 65], [950, 40], [970, 530], [650, 560],
         ].map(([cx, cy]) => (
           <>
             <circle cx={cx} cy={cy} r="4" fill="#1a1f30" />
