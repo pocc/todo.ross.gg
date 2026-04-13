@@ -4,6 +4,7 @@ import { SyncProvider, useSync } from "~/context/sync"
 import { useServer } from "~/context/server"
 import { useLayout } from "~/context/layout"
 import { useGlobalSync } from "~/context/global-sync"
+import { useTheme } from "~/ui/theme"
 import { MessageTimeline } from "~/pages/session/message-timeline"
 import { Composer } from "~/pages/session/composer"
 import { ReviewPanel } from "~/pages/session/review-panel"
@@ -12,16 +13,76 @@ import { SpaceViewport } from "~/components/space-viewport"
 import { SpaceteamPanel } from "~/components/spaceteam-panel"
 import type { Session, MessagePart } from "~/lib/types"
 
+const SendButton: Component<{
+  hasText: boolean
+  sending: boolean
+  onSend: () => void
+  dark: boolean
+}> = (props) => (
+  <button
+    onClick={props.onSend}
+    disabled={!props.hasText || props.sending}
+    style={{
+      padding: "5px 16px",
+      background: props.hasText
+        ? props.dark
+          ? "linear-gradient(180deg, rgba(50, 130, 220, 0.8) 0%, rgba(40, 100, 180, 0.8) 100%)"
+          : "var(--oc-accent-primary)"
+        : props.dark ? "rgba(50, 80, 120, 0.15)" : "var(--oc-bg-tertiary)",
+      color: props.hasText
+        ? props.dark ? "#e0f0ff" : "#fff"
+        : props.dark ? "rgba(100, 150, 200, 0.3)" : "var(--oc-text-disabled)",
+      border: props.hasText
+        ? props.dark ? "1px solid rgba(80, 160, 255, 0.3)" : "1px solid var(--oc-accent-primary)"
+        : props.dark ? "1px solid rgba(60, 100, 160, 0.1)" : "1px solid var(--oc-border-primary)",
+      "border-radius": props.dark ? "4px" : "8px",
+      "font-size": "11px",
+      "font-weight": "600",
+      "font-family": props.dark ? "var(--oc-font-mono)" : "var(--oc-font-sans)",
+      "letter-spacing": props.dark ? "1.5px" : "0.5px",
+      "text-transform": props.dark ? "uppercase" : "none",
+      cursor: props.hasText ? "pointer" : "default",
+      transition: "all 150ms ease",
+      display: "flex",
+      "align-items": "center",
+      gap: "6px",
+      "box-shadow": props.hasText && props.dark ? "0 0 12px rgba(50, 130, 220, 0.2)" : "none",
+    }}
+  >
+    {props.sending ? (
+      <div
+        class="animate-spin"
+        style={{
+          width: "12px",
+          height: "12px",
+          border: "2px solid transparent",
+          "border-top-color": "currentColor",
+          "border-radius": "50%",
+        }}
+      />
+    ) : (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 2L11 13" />
+        <path d="M22 2L15 22L11 13L2 9L22 2Z" />
+      </svg>
+    )}
+    {props.dark ? "Transmit" : "Send"}
+  </button>
+)
+
 const EmptySession: Component = () => {
   const params = useParams<{ dir: string }>()
   const navigate = useNavigate()
   const server = useServer()
+  const theme = useTheme()
   const [text, setText] = createSignal("")
   const [sending, setSending] = createSignal(false)
   const [focused, setFocused] = createSignal(false)
   const directory = () => {
     try { return atob(params.dir) } catch { return "" }
   }
+
+  const isDark = () => theme.resolvedMode() === "dark"
 
   async function handleSend() {
     const msg = text().trim()
@@ -45,110 +106,48 @@ const EmptySession: Component = () => {
   }
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        overflow: "hidden",
-        background: "#05060f",
-        display: "flex",
-        "flex-direction": "column",
-      }}
-    >
-      {/* Cockpit viewport — space scene with frame overlay */}
+    <Show when={isDark()} fallback={
+      /* ===== LIGHT MODE: Clean centered interface ===== */
       <div
         style={{
-          position: "relative",
-          flex: "1",
-          "min-height": "0",
-          overflow: "hidden",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          "flex-direction": "column",
+          "align-items": "center",
+          "justify-content": "center",
+          background: "var(--oc-bg-primary)",
+          padding: "24px",
         }}
       >
-        <SpaceViewport />
-      </div>
-
-      {/* Spaceteam controls strip */}
-      <SpaceteamPanel />
-
-      {/* COMMS terminal — textbox */}
-      <div
-        style={{
-          "flex-shrink": "0",
-          background: "linear-gradient(180deg, #0a0d1a 0%, #080b15 100%)",
-          padding: "0",
-          position: "relative",
-        }}
-      >
-        {/* Status indicators row */}
         <div
           style={{
-            display: "flex",
-            "align-items": "center",
-            "justify-content": "space-between",
-            padding: "6px 16px 4px",
+            width: "100%",
+            "max-width": "600px",
           }}
         >
-          <div
+          <h2
             style={{
-              display: "flex",
-              "align-items": "center",
-              gap: "16px",
+              "font-size": "20px",
+              "font-weight": "500",
+              color: "var(--oc-text-primary)",
+              "margin-bottom": "16px",
+              "font-family": "var(--oc-font-sans)",
             }}
           >
-            {[
-              { label: "COMM", color: "#4ade80" },
-              { label: "NAV", color: "#4ade80" },
-              { label: "SHIELD", color: "#facc15" },
-            ].map((ind) => (
-              <div style={{ display: "flex", "align-items": "center", gap: "5px" }}>
-                <div
-                  style={{
-                    width: "6px",
-                    height: "6px",
-                    "border-radius": "50%",
-                    background: ind.color,
-                    "box-shadow": `0 0 6px ${ind.color}`,
-                  }}
-                />
-                <span
-                  style={{
-                    "font-family": "var(--oc-font-mono)",
-                    "font-size": "9px",
-                    color: "rgba(140, 180, 220, 0.5)",
-                    "letter-spacing": "1px",
-                    "text-transform": "uppercase",
-                  }}
-                >
-                  {ind.label}
-                </span>
-              </div>
-            ))}
-          </div>
-          <span
-            style={{
-              "font-family": "var(--oc-font-mono)",
-              "font-size": "9px",
-              color: "rgba(140, 180, 220, 0.4)",
-              "letter-spacing": "1px",
-            }}
-          >
-            COMMS TERMINAL
-          </span>
-        </div>
-
-        {/* Input area */}
-        <div style={{ padding: "4px 12px 12px" }}>
+            What would you like to work on?
+          </h2>
           <div
             style={{
-              background: "rgba(15, 20, 35, 0.9)",
+              background: "var(--oc-bg-primary)",
               border: focused()
-                ? "1px solid rgba(80, 160, 255, 0.4)"
-                : "1px solid rgba(60, 100, 160, 0.2)",
-              "border-radius": "8px",
+                ? "1px solid var(--oc-border-focus)"
+                : "1px solid var(--oc-border-primary)",
+              "border-radius": "12px",
               overflow: "hidden",
               "box-shadow": focused()
-                ? "0 0 20px rgba(60, 140, 220, 0.08), inset 0 1px 0 rgba(80, 140, 200, 0.1)"
-                : "inset 0 1px 0 rgba(80, 140, 200, 0.05)",
+                ? "0 0 0 3px rgba(91, 91, 230, 0.1)"
+                : "0 1px 3px rgba(0,0,0,0.05)",
               transition: "border-color 200ms ease, box-shadow 200ms ease",
             }}
           >
@@ -158,18 +157,18 @@ const EmptySession: Component = () => {
               onKeyDown={handleKeyDown}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
-              placeholder="Enter command..."
-              aria-label="Enter command"
+              placeholder="Describe a task, ask a question, or paste code..."
+              aria-label="Message input"
               disabled={sending()}
               rows={3}
               style={{
                 width: "100%",
-                padding: "12px 14px",
+                padding: "14px 16px",
                 background: "transparent",
                 border: "none",
-                color: "#c8ddf0",
+                color: "var(--oc-text-primary)",
                 "font-size": "14px",
-                "font-family": "var(--oc-font-mono)",
+                "font-family": "var(--oc-font-sans)",
                 "line-height": "1.5",
                 resize: "none",
                 outline: "none",
@@ -180,70 +179,174 @@ const EmptySession: Component = () => {
                 display: "flex",
                 "align-items": "center",
                 "justify-content": "space-between",
-                padding: "6px 10px",
-                "border-top": "1px solid rgba(60, 100, 160, 0.12)",
+                padding: "8px 12px",
+                "border-top": "1px solid var(--oc-border-primary)",
               }}
             >
               <span
                 style={{
-                  "font-size": "10px",
-                  "font-family": "var(--oc-font-mono)",
-                  color: "rgba(100, 150, 200, 0.3)",
-                  "letter-spacing": "0.5px",
+                  "font-size": "12px",
+                  color: "var(--oc-text-tertiary)",
                 }}
               >
-                ENTER to transmit / SHIFT+ENTER newline
+                Enter to send, Shift+Enter for newline
               </span>
-              <button
-                onClick={handleSend}
-                disabled={!text().trim() || sending()}
-                style={{
-                  padding: "5px 16px",
-                  background: text().trim()
-                    ? "linear-gradient(180deg, rgba(50, 130, 220, 0.8) 0%, rgba(40, 100, 180, 0.8) 100%)"
-                    : "rgba(50, 80, 120, 0.15)",
-                  color: text().trim() ? "#e0f0ff" : "rgba(100, 150, 200, 0.3)",
-                  border: text().trim()
-                    ? "1px solid rgba(80, 160, 255, 0.3)"
-                    : "1px solid rgba(60, 100, 160, 0.1)",
-                  "border-radius": "4px",
-                  "font-size": "11px",
-                  "font-weight": "600",
-                  "font-family": "var(--oc-font-mono)",
-                  "letter-spacing": "1.5px",
-                  "text-transform": "uppercase",
-                  cursor: text().trim() ? "pointer" : "default",
-                  transition: "all 150ms ease",
-                  display: "flex",
-                  "align-items": "center",
-                  gap: "6px",
-                  "box-shadow": text().trim() ? "0 0 12px rgba(50, 130, 220, 0.2)" : "none",
-                }}
-              >
-                {sending() ? (
-                  <div
-                    class="animate-spin"
-                    style={{
-                      width: "12px",
-                      height: "12px",
-                      border: "2px solid transparent",
-                      "border-top-color": "currentColor",
-                      "border-radius": "50%",
-                    }}
-                  />
-                ) : (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 2L11 13" />
-                    <path d="M22 2L15 22L11 13L2 9L22 2Z" />
-                  </svg>
-                )}
-                Transmit
-              </button>
+              <SendButton hasText={!!text().trim()} sending={sending()} onSend={handleSend} dark={false} />
             </div>
           </div>
         </div>
       </div>
-    </div>
+    }>
+      {/* ===== DARK MODE: Cockpit interface ===== */}
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          overflow: "hidden",
+          background: "#05060f",
+          display: "flex",
+          "flex-direction": "column",
+        }}
+      >
+        {/* Cockpit viewport — ISS live feed with frame overlay */}
+        <div
+          style={{
+            position: "relative",
+            flex: "1",
+            "min-height": "0",
+            overflow: "hidden",
+          }}
+        >
+          <SpaceViewport />
+        </div>
+
+        {/* Spaceteam controls strip */}
+        <SpaceteamPanel />
+
+        {/* COMMS terminal — textbox */}
+        <div
+          style={{
+            "flex-shrink": "0",
+            background: "linear-gradient(180deg, #0a0d1a 0%, #080b15 100%)",
+            padding: "0",
+          }}
+        >
+          {/* Status indicators */}
+          <div
+            style={{
+              display: "flex",
+              "align-items": "center",
+              "justify-content": "space-between",
+              padding: "4px 16px 2px",
+            }}
+          >
+            <div style={{ display: "flex", "align-items": "center", gap: "16px" }}>
+              {[
+                { label: "COMM", color: "#4ade80" },
+                { label: "NAV", color: "#4ade80" },
+                { label: "SHIELD", color: "#facc15" },
+              ].map((ind) => (
+                <div style={{ display: "flex", "align-items": "center", gap: "5px" }}>
+                  <div
+                    style={{
+                      width: "6px",
+                      height: "6px",
+                      "border-radius": "50%",
+                      background: ind.color,
+                      "box-shadow": `0 0 6px ${ind.color}`,
+                    }}
+                  />
+                  <span
+                    style={{
+                      "font-family": "var(--oc-font-mono)",
+                      "font-size": "9px",
+                      color: "rgba(140, 180, 220, 0.5)",
+                      "letter-spacing": "1px",
+                      "text-transform": "uppercase",
+                    }}
+                  >
+                    {ind.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <span
+              style={{
+                "font-family": "var(--oc-font-mono)",
+                "font-size": "9px",
+                color: "rgba(140, 180, 220, 0.4)",
+                "letter-spacing": "1px",
+              }}
+            >
+              COMMS TERMINAL
+            </span>
+          </div>
+
+          {/* Input */}
+          <div style={{ padding: "2px 12px 8px" }}>
+            <div
+              style={{
+                background: "rgba(15, 20, 35, 0.9)",
+                border: focused()
+                  ? "1px solid rgba(80, 160, 255, 0.4)"
+                  : "1px solid rgba(60, 100, 160, 0.2)",
+                "border-radius": "8px",
+                overflow: "hidden",
+                "box-shadow": focused()
+                  ? "0 0 20px rgba(60, 140, 220, 0.08), inset 0 1px 0 rgba(80, 140, 200, 0.1)"
+                  : "inset 0 1px 0 rgba(80, 140, 200, 0.05)",
+                transition: "border-color 200ms ease, box-shadow 200ms ease",
+              }}
+            >
+              <textarea
+                value={text()}
+                onInput={(e) => setText(e.currentTarget.value)}
+                onKeyDown={handleKeyDown}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                placeholder="Enter command..."
+                aria-label="Enter command"
+                disabled={sending()}
+                rows={2}
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  background: "transparent",
+                  border: "none",
+                  color: "#c8ddf0",
+                  "font-size": "14px",
+                  "font-family": "var(--oc-font-mono)",
+                  "line-height": "1.5",
+                  resize: "none",
+                  outline: "none",
+                }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  "align-items": "center",
+                  "justify-content": "space-between",
+                  padding: "4px 10px",
+                  "border-top": "1px solid rgba(60, 100, 160, 0.12)",
+                }}
+              >
+                <span
+                  style={{
+                    "font-size": "10px",
+                    "font-family": "var(--oc-font-mono)",
+                    color: "rgba(100, 150, 200, 0.3)",
+                    "letter-spacing": "0.5px",
+                  }}
+                >
+                  ENTER to transmit / SHIFT+ENTER newline
+                </span>
+                <SendButton hasText={!!text().trim()} sending={sending()} onSend={handleSend} dark={true} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Show>
   )
 }
 

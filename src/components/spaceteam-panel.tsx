@@ -52,6 +52,7 @@ const ActionButton: Component<{ name: string; verb: string }> = (props) => {
         display: "flex",
         "flex-direction": "column",
         "align-items": "center",
+        "flex-shrink": "0",
         gap: "4px",
       }}
     >
@@ -105,6 +106,7 @@ const ToggleSwitch: Component<{ name: string }> = (props) => {
         display: "flex",
         "flex-direction": "column",
         "align-items": "center",
+        "flex-shrink": "0",
         gap: "4px",
       }}
     >
@@ -155,6 +157,7 @@ const NumberDial: Component<{ name: string }> = (props) => {
         display: "flex",
         "flex-direction": "column",
         "align-items": "center",
+        "flex-shrink": "0",
         gap: "4px",
       }}
     >
@@ -266,6 +269,7 @@ const Slider: Component<{ name: string }> = (props) => {
         display: "flex",
         "flex-direction": "column",
         "align-items": "center",
+        "flex-shrink": "0",
         gap: "4px",
       }}
     >
@@ -321,8 +325,6 @@ export const SpaceteamPanel: Component = () => {
       { type: "dial" as const, name: n[3] },
       { type: "button" as const, name: n[4], verb: v[1] },
       { type: "toggle" as const, name: n[5] },
-      { type: "slider" as const, name: n[6] },
-      { type: "button" as const, name: n[7], verb: v[2] },
     ]
   }
 
