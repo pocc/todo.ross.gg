@@ -5,6 +5,7 @@ import { useGlobalSync } from "~/context/global-sync"
 import { useLayout } from "~/context/layout"
 import { Button } from "~/ui/components/button"
 import { Spinner } from "~/ui/components/spinner"
+import { ThemeToggle } from "~/components/theme-toggle"
 
 export const Sidebar: Component = () => {
   const params = useParams<{ dir: string; id?: string }>()
@@ -107,42 +108,33 @@ export const Sidebar: Component = () => {
           "flex-shrink": "0",
         }}
       >
-        <button
-          onClick={handleBackToHome}
-          style={{
-            display: "flex",
-            "align-items": "center",
-            gap: "6px",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: "4px 0",
-            color: "var(--oc-text-tertiary)",
-            "font-size": "11px",
-            "font-family": "var(--oc-font-sans)",
-            "margin-bottom": "6px",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = "var(--oc-text-primary)"
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = "var(--oc-text-tertiary)"
-          }}
-        >
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+        <div style={{ display: "flex", "align-items": "center", "justify-content": "space-between", "margin-bottom": "6px" }}>
+          <button
+            onClick={handleBackToHome}
+            style={{
+              display: "flex",
+              "align-items": "center",
+              gap: "6px",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "4px 0",
+              color: "var(--oc-text-tertiary)",
+              "font-size": "11px",
+              "font-family": "var(--oc-font-sans)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "var(--oc-text-primary)"
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "var(--oc-text-tertiary)"
+            }}
           >
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-          Home
-        </button>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+            Home
+          </button>
+          <ThemeToggle />
+        </div>
         <div
           style={{
             "font-size": "14px",
@@ -189,6 +181,7 @@ export const Sidebar: Component = () => {
           value={filter()}
           onInput={(e) => setFilter(e.currentTarget.value)}
           placeholder="Filter sessions..."
+          aria-label="Filter sessions"
           style={{
             width: "100%",
             padding: "6px 10px",
@@ -304,7 +297,7 @@ export const Sidebar: Component = () => {
                   </div>
                   <span
                     style={{
-                      "font-size": "11px",
+                      "font-size": "12px",
                       color: "var(--oc-text-tertiary)",
                       "flex-shrink": "0",
                     }}
@@ -328,6 +321,7 @@ export const Sidebar: Component = () => {
       >
         <button
           onClick={layout.toggleSidebar}
+          aria-label="Toggle sidebar"
           style={{
             display: "flex",
             "align-items": "center",

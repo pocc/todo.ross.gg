@@ -95,7 +95,14 @@ const ToolInvocationPartView: Component<{ part: ToolInvocationPart }> = (props) 
       }}
     >
       <div
+        role="button"
+        tabIndex={0}
+        aria-expanded={expanded()}
+        aria-label={`${expanded() ? "Collapse" : "Expand"} ${props.part.toolName} details`}
         onClick={() => setExpanded(!expanded())}
+        onKeyDown={(e: KeyboardEvent) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setExpanded(!expanded()) }
+        }}
         style={{
           display: "flex",
           "align-items": "center",

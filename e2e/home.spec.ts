@@ -17,11 +17,8 @@ test.describe("Home Page — Layout & Content", () => {
     await expect(page.getByText("Not connected")).toBeVisible()
   })
 
-  test("has a setup guide toggle or visible guide", async ({ page }) => {
-    // Either the guide is visible or the toggle link is
-    const guideVisible = await page.getByText("Quick Start").isVisible()
-    const linkVisible = await page.getByText("Setup guide").isVisible()
-    expect(guideVisible || linkVisible).toBe(true)
+  test("shows setup guide when disconnected", async ({ page }) => {
+    await expect(page.getByText("Quick Start")).toBeVisible()
   })
 
   test("shows Recent Projects heading", async ({ page }) => {
@@ -70,15 +67,10 @@ test.describe("Home Page — Setup Guide", () => {
     await expect(page.getByText("OPENCODE_SERVER_PASSWORD")).toBeVisible()
   })
 
-  test("setup guide toggle hides/shows the guide", async ({ page }) => {
-    // Guide visible initially
+  test("setup guide is always visible when disconnected", async ({ page }) => {
     await expect(page.getByText("Quick Start")).toBeVisible()
-    // Click "Hide setup" to toggle
-    await page.getByText("Hide setup").click()
-    await expect(page.getByText("Quick Start")).not.toBeVisible()
-    // Click "Setup guide" to show again
-    await page.getByText("Setup guide").click()
-    await expect(page.getByText("Quick Start")).toBeVisible()
+    // No toggle — guide stays visible until connected
+    await expect(page.getByText("npm i -g opencode")).toBeVisible()
   })
 })
 

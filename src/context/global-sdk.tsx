@@ -1,5 +1,5 @@
 import { createContext, useContext, type ParentComponent } from "solid-js"
-import { createSignal, onMount, onCleanup } from "solid-js"
+import { createSignal, createEffect, onMount, onCleanup } from "solid-js"
 import { useServer } from "~/context/server"
 import type { SSEEvent } from "~/lib/types"
 
@@ -24,6 +24,9 @@ export const GlobalSDKProvider: ParentComponent = (props) => {
   const [lastEventTime, setLastEventTime] = createSignal(Date.now())
   let heartbeatTimer: ReturnType<typeof setInterval> | undefined
   let reconnectTimer: ReturnType<typeof setTimeout> | undefined
+  let reconnectAttempts = 0
+  const MAX_RECONNECT_ATTEMPTS = 5
+  const MAX_BACKOFF_MS = 30_000
 
   function coalesceQueue(queue: SSEEvent[]): SSEEvent[] {
     const result: SSEEvent[] = []
@@ -84,7 +87,16 @@ export const GlobalSDKProvider: ParentComponent = (props) => {
     rafHandle = requestAnimationFrame(flushQueue)
   }
 
+  /** Returns true if the SSE connection is open or connecting */
+  function isSSEActive(): boolean {
+    return eventSource !== null && eventSource.readyState !== EventSource.CLOSED
+  }
+
   function connectSSE() {
+    if (!server.connected) return
+    // Don't open a new connection if one is already active
+    if (isSSEActive()) return
+
     if (eventSource) {
       eventSource.close()
       eventSource = null
@@ -93,8 +105,13 @@ export const GlobalSDKProvider: ParentComponent = (props) => {
     const sdk = server.sdk
     const es = sdk.createEventSource("/global/event")
 
+    es.onopen = () => {
+      reconnectAttempts = 0
+    }
+
     es.onmessage = (ev) => {
       setLastEventTime(Date.now())
+      reconnectAttempts = 0
       try {
         const parsed: SSEEvent = JSON.parse(ev.data)
         eventQueue.push(parsed)
@@ -107,10 +124,23 @@ export const GlobalSDKProvider: ParentComponent = (props) => {
       es.close()
       eventSource = null
       clearReconnect()
-      reconnectTimer = setTimeout(connectSSE, 250)
+
+      if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), MAX_BACKOFF_MS)
+        reconnectAttempts++
+        reconnectTimer = setTimeout(connectSSE, delay)
+      }
     }
 
     eventSource = es
+  }
+
+  function disconnectSSE() {
+    if (eventSource) {
+      eventSource.close()
+      eventSource = null
+    }
+    clearReconnect()
   }
 
   function clearReconnect() {
@@ -120,31 +150,39 @@ export const GlobalSDKProvider: ParentComponent = (props) => {
     }
   }
 
+  // Connect/disconnect SSE based on server connection state
+  createEffect(() => {
+    if (server.connected) {
+      reconnectAttempts = 0
+      connectSSE()
+    } else {
+      disconnectSSE()
+    }
+  })
+
   onMount(() => {
-    connectSSE()
     rafHandle = requestAnimationFrame(flushQueue)
 
+    // Heartbeat: reconnect only if connection dropped silently (no events for 30s)
     heartbeatTimer = setInterval(() => {
-      if (Date.now() - lastEventTime() > 15000) {
+      if (server.connected && !isSSEActive() && Date.now() - lastEventTime() > 30_000) {
+        reconnectAttempts = 0
         connectSSE()
       }
-    }, 5000)
+    }, 15_000)
 
     const handleVisibility = () => {
-      if (document.visibilityState === "visible") {
+      if (document.visibilityState === "visible" && server.connected && !isSSEActive()) {
+        reconnectAttempts = 0
         connectSSE()
       }
     }
     document.addEventListener("visibilitychange", handleVisibility)
 
     onCleanup(() => {
-      if (eventSource) {
-        eventSource.close()
-        eventSource = null
-      }
+      disconnectSSE()
       cancelAnimationFrame(rafHandle)
       if (heartbeatTimer) clearInterval(heartbeatTimer)
-      clearReconnect()
       document.removeEventListener("visibilitychange", handleVisibility)
     })
   })

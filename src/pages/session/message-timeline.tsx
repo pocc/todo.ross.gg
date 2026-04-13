@@ -1,6 +1,7 @@
 import { Component, For, Show, createEffect, onMount } from "solid-js"
 import type { Message, AssistantMessage } from "~/lib/types"
 import { Spinner } from "~/ui/components/spinner"
+import { Markdown } from "~/ui/components/markdown"
 
 interface Turn {
   user: Message | null
@@ -87,6 +88,8 @@ export const MessageTimeline: Component<MessageTimelineProps> = (props) => {
     <div
       ref={scrollRef}
       onScroll={handleScroll}
+      role="log"
+      aria-label="Conversation messages"
       style={{
         flex: "1",
         "overflow-y": "auto",
@@ -114,6 +117,10 @@ export const MessageTimeline: Component<MessageTimelineProps> = (props) => {
             style={{
               padding: "0 24px",
               "margin-bottom": "4px",
+              "max-width": "720px",
+              "margin-left": "auto",
+              "margin-right": "auto",
+              width: "100%",
             }}
           >
             {/* User message */}
@@ -224,7 +231,7 @@ export const MessageTimeline: Component<MessageTimelineProps> = (props) => {
                     <Show when={assistantMsg().metadata?.model}>
                       <span
                         style={{
-                          "font-size": "11px",
+                          "font-size": "12px",
                           color: "var(--oc-text-tertiary)",
                           "font-family": "var(--oc-font-mono)",
                         }}
@@ -234,18 +241,12 @@ export const MessageTimeline: Component<MessageTimelineProps> = (props) => {
                     </Show>
                   </div>
 
-                  {/* Text content */}
-                  <div
-                    style={{
-                      "padding-left": "30px",
-                      "font-size": "14px",
-                      color: "var(--oc-text-primary)",
-                      "line-height": "1.6",
-                      "white-space": "pre-wrap",
-                      "word-break": "break-word",
-                    }}
-                  >
-                    {extractTextContent(assistantMsg())}
+                  {/* Text content - rendered as markdown */}
+                  <div style={{ "padding-left": "30px" }}>
+                    <Markdown
+                      content={extractTextContent(assistantMsg())}
+                      streaming={assistantMsg().metadata?.status === "running"}
+                    />
                   </div>
 
                   {/* Tool calls */}
@@ -293,7 +294,7 @@ export const MessageTimeline: Component<MessageTimelineProps> = (props) => {
                               {tool.toolName}
                             </span>
                             <span style={{ color: "var(--oc-text-tertiary)" }}>
-                              {tool.state}
+                              {tool.state === "completed" ? "done" : tool.state === "error" ? "failed" : tool.state}
                             </span>
                           </div>
                         )}
@@ -307,7 +308,7 @@ export const MessageTimeline: Component<MessageTimelineProps> = (props) => {
                       style={{
                         "padding-left": "30px",
                         "margin-top": "8px",
-                        "font-size": "11px",
+                        "font-size": "12px",
                         color: "var(--oc-text-tertiary)",
                         "font-family": "var(--oc-font-mono)",
                       }}

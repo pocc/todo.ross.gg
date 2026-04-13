@@ -128,6 +128,7 @@ export const Composer: Component<ComposerProps> = (props) => {
                 <span>{file.name}</span>
                 <button
                   onClick={() => removeFile(idx())}
+                  aria-label={`Remove ${file.name}`}
                   style={{
                     background: "none",
                     border: "none",
@@ -175,6 +176,7 @@ export const Composer: Component<ComposerProps> = (props) => {
           onInput={handleInput}
           onKeyDown={handleKeyDown}
           placeholder="Send a message..."
+          aria-label="Message input"
           disabled={props.isRunning}
           rows={1}
           style={{
@@ -253,7 +255,7 @@ export const Composer: Component<ComposerProps> = (props) => {
       >
         <span
           style={{
-            "font-size": "11px",
+            "font-size": "12px",
             color: "var(--oc-text-tertiary)",
             "font-family": "var(--oc-font-mono)",
           }}
@@ -262,12 +264,12 @@ export const Composer: Component<ComposerProps> = (props) => {
         </span>
         <span
           style={{
-            "font-size": "11px",
+            "font-size": "12px",
             color: "var(--oc-text-tertiary)",
             "font-family": "var(--oc-font-mono)",
           }}
         >
-          {text().length > 0 ? `${text().length} chars` : ""}
+          {text().length > 0 ? `${text().length} chars` : "Enter to send, Shift+Enter for newline"}
         </span>
       </div>
     </div>
