@@ -286,15 +286,15 @@ const EmptySession: Component = () => {
           <div style={{ padding: "2px 12px 8px" }}>
             <div
               style={{
-                background: "rgba(15, 20, 35, 0.9)",
+                background: "rgba(10, 15, 30, 0.95)",
                 border: focused()
-                  ? "1px solid rgba(80, 160, 255, 0.4)"
-                  : "1px solid rgba(60, 100, 160, 0.2)",
+                  ? "1px solid rgba(80, 160, 255, 0.5)"
+                  : "1px solid rgba(80, 140, 200, 0.3)",
                 "border-radius": "8px",
                 overflow: "hidden",
                 "box-shadow": focused()
-                  ? "0 0 20px rgba(60, 140, 220, 0.08), inset 0 1px 0 rgba(80, 140, 200, 0.1)"
-                  : "inset 0 1px 0 rgba(80, 140, 200, 0.05)",
+                  ? "0 0 24px rgba(60, 140, 220, 0.15), inset 0 1px 0 rgba(80, 140, 200, 0.15)"
+                  : "0 0 12px rgba(40, 100, 180, 0.06), inset 0 1px 0 rgba(80, 140, 200, 0.08)",
                 transition: "border-color 200ms ease, box-shadow 200ms ease",
               }}
             >
