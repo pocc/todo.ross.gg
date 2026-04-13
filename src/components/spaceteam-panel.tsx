@@ -308,12 +308,7 @@ const Slider: Component<{ name: string }> = (props) => {
 export const SpaceteamPanel: Component = () => {
   const [names] = createSignal(shuffle(CONTROL_NAMES))
   const [verbs] = createSignal(shuffle(BUTTON_VERBS))
-  const [blinkOn, setBlinkOn] = createSignal(true)
-
-  onMount(() => {
-    const iv = setInterval(() => setBlinkOn((v) => !v), 800)
-    onCleanup(() => clearInterval(iv))
-  })
+  const [_blinkOn] = createSignal(true)
 
   const controls = () => {
     const n = names()
@@ -405,9 +400,8 @@ export const SpaceteamPanel: Component = () => {
             "font-family": "var(--oc-font-mono)",
             "font-size": "9px",
             "font-weight": "700",
-            color: blinkOn() ? "rgba(250, 200, 50, 0.7)" : "transparent",
+            color: "rgba(250, 200, 50, 0.6)",
             "letter-spacing": "1px",
-            transition: "color 100ms",
           }}
         >
           !! PORKCHOP LEVELS CRITICAL !!
