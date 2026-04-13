@@ -1,7 +1,8 @@
-import { Component, createSignal, Show, For, createEffect } from "solid-js"
+import { Component, createSignal, Show, For } from "solid-js"
 import { useNavigate } from "@solidjs/router"
 import { useServer } from "~/context/server"
 import { Button } from "~/ui/components/button"
+import { ThemeToggle } from "~/components/theme-toggle"
 
 export const HomePage: Component = () => {
   const server = useServer()
@@ -11,7 +12,6 @@ export const HomePage: Component = () => {
   const [dirInput, setDirInput] = createSignal("")
   const [showDirInput, setShowDirInput] = createSignal(false)
   const [connecting, setConnecting] = createSignal(false)
-  const [showSetup, setShowSetup] = createSignal(!server.connected)
   const [copied, setCopied] = createSignal(false)
 
   const serveCommand = () => `opencode serve --cors https://todo.ross.gg`
@@ -69,11 +69,6 @@ export const HomePage: Component = () => {
     }
   }
 
-  // Hide setup once connected
-  createEffect(() => {
-    if (server.connected) setShowSetup(false)
-  })
-
   return (
     <div
       style={{
@@ -85,8 +80,14 @@ export const HomePage: Component = () => {
         padding: "48px 24px",
         background: "var(--oc-bg-primary)",
         overflow: "auto",
+        position: "relative",
       }}
     >
+      {/* Theme toggle */}
+      <div style={{ position: "absolute", top: "16px", right: "16px" }}>
+        <ThemeToggle />
+      </div>
+
       {/* Header */}
       <div
         style={{
@@ -151,29 +152,11 @@ export const HomePage: Component = () => {
           <span>
             {server.connected ? "Connected" : "Not connected"}
           </span>
-          <Show when={!server.connected}>
-            <button
-              onClick={() => setShowSetup(!showSetup())}
-              style={{
-                background: "none",
-                border: "none",
-                color: "var(--oc-accent-primary)",
-                cursor: "pointer",
-                "font-size": "13px",
-                "text-decoration": "underline",
-                "text-underline-offset": "2px",
-                padding: "0",
-                "font-family": "var(--oc-font-sans)",
-              }}
-            >
-              {showSetup() ? "Hide setup" : "Setup guide"}
-            </button>
-          </Show>
         </div>
       </div>
 
       {/* Setup Instructions */}
-      <Show when={showSetup() && !server.connected}>
+      <Show when={!server.connected}>
         <div
           style={{
             width: "100%",
@@ -400,73 +383,75 @@ export const HomePage: Component = () => {
         </div>
       </Show>
 
-      {/* Server URL connect */}
-      <div
-        style={{
-          width: "100%",
-          "max-width": "520px",
-          "margin-bottom": "32px",
-        }}
-      >
-        <label
+      {/* Server URL connect — only when disconnected */}
+      <Show when={!server.connected}>
+        <div
           style={{
-            display: "block",
-            "font-size": "12px",
-            "font-weight": "500",
-            color: "var(--oc-text-tertiary)",
-            "margin-bottom": "6px",
-            "text-transform": "uppercase",
-            "letter-spacing": "0.5px",
+            width: "100%",
+            "max-width": "520px",
+            "margin-bottom": "32px",
           }}
         >
-          Server URL
-        </label>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <input
-            type="text"
-            value={urlInput()}
-            onInput={(e) => setUrlInput(e.currentTarget.value)}
-            onKeyDown={handleConnectKeyDown}
-            placeholder="http://localhost:4096"
+          <label
             style={{
-              flex: "1",
-              padding: "8px 12px",
-              background: "var(--oc-surface-primary)",
-              border: "1px solid var(--oc-border-primary)",
-              "border-radius": "var(--oc-radius-md)",
-              color: "var(--oc-text-primary)",
-              "font-size": "13px",
-              "font-family": "var(--oc-font-mono)",
-              outline: "none",
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = "var(--oc-border-focus)"
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = "var(--oc-border-primary)"
-            }}
-          />
-          <Button
-            variant="primary"
-            size="md"
-            loading={connecting()}
-            onClick={handleConnect}
-          >
-            Connect
-          </Button>
-        </div>
-        <Show when={server.error}>
-          <p
-            style={{
+              display: "block",
               "font-size": "12px",
-              color: "var(--oc-error)",
-              "margin-top": "6px",
+              "font-weight": "500",
+              color: "var(--oc-text-tertiary)",
+              "margin-bottom": "6px",
+              "text-transform": "uppercase",
+              "letter-spacing": "0.5px",
             }}
           >
-            {server.error}
-          </p>
-        </Show>
-      </div>
+            Server URL
+          </label>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <input
+              type="text"
+              value={urlInput()}
+              onInput={(e) => setUrlInput(e.currentTarget.value)}
+              onKeyDown={handleConnectKeyDown}
+              placeholder="http://localhost:4096"
+              style={{
+                flex: "1",
+                padding: "8px 12px",
+                background: "var(--oc-surface-primary)",
+                border: "1px solid var(--oc-border-primary)",
+                "border-radius": "var(--oc-radius-md)",
+                color: "var(--oc-text-primary)",
+                "font-size": "13px",
+                "font-family": "var(--oc-font-mono)",
+                outline: "none",
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "var(--oc-border-focus)"
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "var(--oc-border-primary)"
+              }}
+            />
+            <Button
+              variant="primary"
+              size="md"
+              loading={connecting()}
+              onClick={handleConnect}
+            >
+              Connect
+            </Button>
+          </div>
+          <Show when={server.error}>
+            <p
+              style={{
+                "font-size": "12px",
+                color: "var(--oc-error)",
+                "margin-top": "6px",
+              }}
+            >
+              {server.error}
+            </p>
+          </Show>
+        </div>
+      </Show>
 
       {/* Recent Projects */}
       <div
@@ -686,6 +671,28 @@ export const HomePage: Component = () => {
             </For>
           </div>
         </Show>
+      </div>
+
+      {/* Build info footer */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: "12px",
+          left: "0",
+          right: "0",
+          "font-size": "11px",
+          "font-family": "var(--oc-font-mono)",
+          color: "var(--oc-text-disabled)",
+          "text-align": "center",
+          "line-height": "1.6",
+          "pointer-events": "none",
+        }}
+      >
+        <span>{__COMMIT_HASH__}</span>
+        <span style={{ margin: "0 6px" }}>&middot;</span>
+        <span>committed {new Date(__COMMIT_TIME__).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
+        <span style={{ margin: "0 6px" }}>&middot;</span>
+        <span>deployed {new Date(__BUILD_TIME__).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</span>
       </div>
     </div>
   )

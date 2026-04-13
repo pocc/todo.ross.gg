@@ -9,14 +9,14 @@ export interface SDKOptions {
 }
 
 export function getServerUrl(): string {
-  return (
-    import.meta.env.VITE_OPENCODE_SERVER_URL ||
-    import.meta.env.VITE_OPENCODE_SERVER_HOST
-      ? `http://${import.meta.env.VITE_OPENCODE_SERVER_HOST}:${import.meta.env.VITE_OPENCODE_SERVER_PORT || "4096"}`
-      : typeof window !== "undefined" && window.location.hostname !== "localhost"
-        ? window.location.origin
-        : DEFAULT_SERVER_URL
-  )
+  if (import.meta.env.VITE_OPENCODE_SERVER_URL) {
+    return import.meta.env.VITE_OPENCODE_SERVER_URL
+  }
+  if (import.meta.env.VITE_OPENCODE_SERVER_HOST) {
+    return `http://${import.meta.env.VITE_OPENCODE_SERVER_HOST}:${import.meta.env.VITE_OPENCODE_SERVER_PORT || "4096"}`
+  }
+  // Always default to localhost:4096 — the user's local opencode server
+  return DEFAULT_SERVER_URL
 }
 
 function createFetch(options: SDKOptions) {
@@ -72,8 +72,19 @@ export function createSDKClient(options: SDKOptions = {}) {
       options.directory = dir
     },
 
-    // Health
-    health: () => request("/global/health").then((r) => r.ok),
+    // Health — verify response is JSON (not SPA fallback HTML)
+    health: async () => {
+      try {
+        const r = await request("/global/health")
+        if (!r.ok) return false
+        const ct = r.headers.get("content-type") || ""
+        if (!ct.includes("application/json")) return false
+        await r.json()
+        return true
+      } catch {
+        return false
+      }
+    },
 
     // Config
     getConfig: () => json<Config>("/global/config"),
@@ -143,8 +154,21 @@ export function createSDKClient(options: SDKOptions = {}) {
       return url.toString()
     },
 
-    // Projects
-    listProjects: () => json<{ projects: Project[] }>("/project"),
+    // Projects — API returns a flat array, not wrapped
+    listProjects: async () => {
+      const projects = await json<any[]>("/project")
+      // Normalize: API uses unix timestamps, derive name from worktree
+      return projects.map((p: any) => ({
+        id: p.id,
+        worktree: p.worktree,
+        name: p.worktree === "/" ? "/" : p.worktree.split("/").pop() || p.worktree,
+        git: p.vcs === "git" ? { branch: p.branch } : undefined,
+        time: {
+          created: typeof p.time?.created === "number" ? new Date(p.time.created).toISOString() : p.time?.created,
+          updated: typeof p.time?.updated === "number" ? new Date(p.time.updated).toISOString() : p.time?.updated,
+        },
+      })) as Project[]
+    },
     initProject: (directory: string) =>
       json<Project>("/project", { method: "POST", body: JSON.stringify({ directory }) }),
 

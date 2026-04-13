@@ -67,17 +67,17 @@ function generateScale(hex: string): Record<string, string> {
 }
 
 const CSS_VAR_MAP: Record<keyof ThemeColors, string> = {
-  bg: "--oc-bg",
+  bg: "--oc-bg-primary",
   bgSecondary: "--oc-bg-secondary",
   bgTertiary: "--oc-bg-tertiary",
-  surface: "--oc-surface",
+  surface: "--oc-surface-primary",
   surfaceSecondary: "--oc-surface-secondary",
-  text: "--oc-text",
+  text: "--oc-text-primary",
   textSecondary: "--oc-text-secondary",
   textTertiary: "--oc-text-tertiary",
-  border: "--oc-border",
+  border: "--oc-border-primary",
   borderSecondary: "--oc-border-secondary",
-  accent: "--oc-accent",
+  accent: "--oc-accent-primary",
   accentHover: "--oc-accent-hover",
   accentText: "--oc-accent-text",
   success: "--oc-success",
@@ -111,6 +111,14 @@ export function resolveThemeCSS(theme: ThemeDefinition, mode: "light" | "dark"):
       lines.push(`  ${varName}: ${toHsl(hex)};`)
     }
   }
+
+  // Derived vars that components expect
+  lines.push(`  --oc-bg-elevated: ${adjustLightness(colors.bg, mode === "dark" ? 8 : -3)};`)
+  lines.push(`  --oc-bg-hover: ${adjustLightness(colors.bgSecondary, mode === "dark" ? 6 : -4)};`)
+  lines.push(`  --oc-bg-active: ${adjustLightness(colors.bgSecondary, mode === "dark" ? 10 : -8)};`)
+  lines.push(`  --oc-surface-tertiary: ${adjustLightness(colors.surfaceSecondary, mode === "dark" ? 5 : -4)};`)
+  lines.push(`  --oc-text-disabled: ${adjustLightness(colors.textTertiary, mode === "dark" ? -10 : 15)};`)
+  lines.push(`  --oc-border-focus: ${toHsl(colors.accent)};`)
 
   // Generate accent scale from accent seed
   const accentScale = generateScale(colors.accent)

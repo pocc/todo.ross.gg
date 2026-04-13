@@ -22,34 +22,43 @@ export const ServerProvider: ParentComponent = (props) => {
   const [projects, setProjects] = createStore<Project[]>([])
 
   let sdk = createSDKClient({ serverUrl: serverUrl() })
+  let consecutiveFailures = 0
 
   async function checkHealth() {
     try {
       const ok = await sdk.health()
-      setConnected(ok)
       if (ok) {
+        setConnected(true)
         setError(null)
+        consecutiveFailures = 0
         try {
-          const result = await sdk.listProjects()
-          setProjects(reconcile(result.projects))
+          const projects = await sdk.listProjects()
+          setProjects(reconcile(projects))
         } catch {
           // projects fetch failed but server is up
         }
       } else {
         setConnected(false)
+        consecutiveFailures++
         setError("Server returned unhealthy status")
       }
     } catch (err) {
       setConnected(false)
-      setError(err instanceof Error ? err.message : "Connection failed")
+      consecutiveFailures++
+      // Only set error on first failure or explicit connect attempt
+      if (consecutiveFailures <= 1) {
+        setError(err instanceof Error ? err.message : "Connection failed")
+      }
     }
   }
 
   async function connect(url: string) {
+    const isNewUrl = url !== serverUrl()
     setServerUrl(url)
     sdk = createSDKClient({ serverUrl: url })
     setError(null)
-    setConnected(false)
+    if (isNewUrl) setConnected(false)
+    consecutiveFailures = 0
     await checkHealth()
   }
 
@@ -57,8 +66,27 @@ export const ServerProvider: ParentComponent = (props) => {
     checkHealth()
   })
 
-  const timer = setInterval(checkHealth, 10000)
-  onCleanup(() => clearInterval(timer))
+  // Health polling with backoff: 10s when connected, increasing intervals when disconnected
+  // Max poll interval: 60s when server is down
+  let pollTimer: ReturnType<typeof setTimeout> | undefined
+
+  function schedulePoll() {
+    const delay = connected()
+      ? 10_000
+      : Math.min(10_000 * Math.pow(2, Math.min(consecutiveFailures, 4)), 60_000)
+    pollTimer = setTimeout(async () => {
+      await checkHealth()
+      schedulePoll()
+    }, delay)
+  }
+
+  onMount(() => {
+    schedulePoll()
+  })
+
+  onCleanup(() => {
+    if (pollTimer) clearTimeout(pollTimer)
+  })
 
   const state: ServerState = {
     get serverUrl() {
