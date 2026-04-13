@@ -1,7 +1,8 @@
 import { Component } from "solid-js"
 
 export const SpaceViewport: Component = () => {
-  const issStreamUrl = "https://www.youtube.com/embed/zPH5KtjJFaQ?autoplay=1&mute=1&showinfo=0&rel=0&controls=0&modestbranding=1&playsinline=1"
+  // NASA ISS HD Earth Viewing — confirmed working stream
+  const streamUrl = "https://www.youtube.com/embed/zPH5KtjJFaQ?autoplay=1&mute=1&showinfo=0&rel=0&controls=0&modestbranding=1&playsinline=1"
 
   return (
     <div
@@ -14,9 +15,18 @@ export const SpaceViewport: Component = () => {
       }}
       aria-hidden="true"
     >
+      {/* Starfield fallback behind iframe */}
+      <div
+        style={{
+          position: "absolute",
+          inset: "0",
+          background: "radial-gradient(ellipse at 40% 30%, #0d1030 0%, #050810 50%, #020408 100%)",
+        }}
+      />
+
       {/* ISS live feed */}
       <iframe
-        src={issStreamUrl}
+        src={streamUrl}
         style={{
           position: "absolute",
           top: "-15%",
@@ -25,6 +35,7 @@ export const SpaceViewport: Component = () => {
           height: "130%",
           border: "none",
           "pointer-events": "none",
+          "z-index": "1",
         }}
         allow="autoplay; encrypted-media"
         tabIndex={-1}
@@ -40,6 +51,7 @@ export const SpaceViewport: Component = () => {
           width: "100%",
           height: "100%",
           "pointer-events": "none",
+          "z-index": "2",
         }}
       >
         <defs>
@@ -103,6 +115,7 @@ export const SpaceViewport: Component = () => {
           inset: "0",
           "pointer-events": "none",
           "font-family": "var(--oc-font-mono)",
+          "z-index": "3",
         }}
       >
         <div
@@ -159,6 +172,7 @@ export const SpaceViewport: Component = () => {
           position: "absolute",
           inset: "0",
           "pointer-events": "none",
+          "z-index": "4",
           background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.02) 3px, rgba(0,0,0,0.02) 4px)",
           opacity: "0.4",
         }}
@@ -170,6 +184,7 @@ export const SpaceViewport: Component = () => {
           position: "absolute",
           inset: "0",
           "pointer-events": "none",
+          "z-index": "4",
           "box-shadow": "inset 0 0 80px rgba(0,0,0,0.5)",
         }}
       />
