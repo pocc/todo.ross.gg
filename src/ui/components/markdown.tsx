@@ -36,7 +36,7 @@ function renderMarkdown(content: string): string {
 function addCopyButtons(html: string): string {
   return html.replace(
     /<pre>/g,
-    `<pre style="position:relative;"><button data-copy-code style="position:absolute;top:6px;right:6px;padding:2px 8px;font-size:11px;background:var(--oc-surface-tertiary);color:var(--oc-text-secondary);border:1px solid var(--oc-border-primary);border-radius:var(--oc-radius-sm);cursor:pointer;font-family:var(--oc-font-sans);z-index:1;">Copy</button>`
+    `<pre style="position:relative;"><button data-copy-code aria-label="Copy code to clipboard" style="position:absolute;top:6px;right:6px;padding:2px 8px;font-size:12px;background:var(--oc-surface-tertiary);color:var(--oc-text-secondary);border:1px solid var(--oc-border-primary);border-radius:var(--oc-radius-sm);cursor:pointer;font-family:var(--oc-font-sans);z-index:1;">Copy</button>`
   )
 }
 
@@ -78,7 +78,7 @@ export const Markdown: Component<MarkdownProps> = (props) => {
   return (
     <div
       ref={containerRef}
-      class={local.class}
+      class={`markdown-body ${local.class ?? ""}`}
       style={{
         "font-size": "13px",
         "line-height": "1.65",

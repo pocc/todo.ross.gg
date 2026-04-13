@@ -181,6 +181,7 @@ export const Sidebar: Component = () => {
           value={filter()}
           onInput={(e) => setFilter(e.currentTarget.value)}
           placeholder="Filter sessions..."
+          aria-label="Filter sessions"
           style={{
             width: "100%",
             padding: "6px 10px",
@@ -296,7 +297,7 @@ export const Sidebar: Component = () => {
                   </div>
                   <span
                     style={{
-                      "font-size": "11px",
+                      "font-size": "12px",
                       color: "var(--oc-text-tertiary)",
                       "flex-shrink": "0",
                     }}
@@ -320,6 +321,7 @@ export const Sidebar: Component = () => {
       >
         <button
           onClick={layout.toggleSidebar}
+          aria-label="Toggle sidebar"
           style={{
             display: "flex",
             "align-items": "center",
