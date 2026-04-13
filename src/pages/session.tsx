@@ -268,15 +268,18 @@ const EmptySession: Component = () => {
           "flex-direction": "column",
         }}
       >
-        {/* Viewport — ISS feed, top third */}
+        {/* Viewport — ISS feed, top 40% with matching side margins */}
         <div
           style={{
             position: "relative",
             flex: "0 0 40%",
             overflow: "hidden",
+            padding: "0 16px",
           }}
         >
-          <SpaceViewport />
+          <div style={{ position: "relative", width: "100%", height: "100%", "max-width": "800px", margin: "0 auto", overflow: "hidden", "border-radius": "0 0 4px 4px" }}>
+            <SpaceViewport />
+          </div>
         </div>
 
         {/* Control panel — fills remaining 2/3, textbox surrounded by controls */}
