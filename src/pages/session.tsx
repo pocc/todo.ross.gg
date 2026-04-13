@@ -1,4 +1,4 @@
-import { Component, Show, createEffect, createSignal } from "solid-js"
+import { Component, Show, createEffect, createSignal, onMount, onCleanup } from "solid-js"
 import { useParams, useNavigate } from "@solidjs/router"
 import { SyncProvider, useSync } from "~/context/sync"
 import { useServer } from "~/context/server"
@@ -10,8 +10,68 @@ import { Composer } from "~/pages/session/composer"
 import { ReviewPanel } from "~/pages/session/review-panel"
 import { SessionHeader } from "~/pages/session/session-header"
 import { SpaceViewport } from "~/components/space-viewport"
-import { SpaceteamPanel } from "~/components/spaceteam-panel"
+import { SpaceteamPanel, ActionButton, ToggleSwitch, NumberDial, Slider } from "~/components/spaceteam-panel"
 import type { Session, MessagePart } from "~/lib/types"
+
+const LOG_MESSAGES = [
+  "Porkchop reserves at 34%... initiating rationing protocol",
+  "Recalibrating flux wobbler... standby",
+  "Warning: unauthorized snacks detected in cargo bay 7",
+  "Graviton defibrilator output nominal",
+  "Helmsman reports mild existential dread",
+  "Muffin drive temperature within tolerance",
+  "Quantum biscuit alignment verified",
+  "Incoming hail from Sector 7G... ignoring",
+  "Hull integrity check passed (barely)",
+  "Auxiliary porkchops online",
+  "Space-time continuum: mostly intact",
+  "Turbo encabulator engaged at 73% capacity",
+  "Cosmic ray diffuser needs recalibration by Tuesday",
+  "Life support: functional (for now)",
+  "Tachyon snorkel valve pressure holding steady",
+  "Subspatial interference detected... it was just Dave",
+  "Coffee reserves critical — crew morale declining",
+  "Navigation: still lost, but making good time",
+  "Photomist levels acceptable in sectors A through G",
+  "Dark energy dimmer set to 'cozy'",
+]
+
+const ShipLog: Component = () => {
+  const [lines, setLines] = createSignal<string[]>([])
+  let msgIndex = 0
+
+  const addLine = () => {
+    const time = new Date().toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" })
+    const msg = LOG_MESSAGES[msgIndex % LOG_MESSAGES.length]
+    msgIndex++
+    setLines((prev) => [...prev.slice(-6), `${time} ${msg}`])
+  }
+
+  onMount(() => {
+    addLine()
+    addLine()
+    addLine()
+    const iv = setInterval(addLine, 4000 + Math.random() * 3000)
+    onCleanup(() => clearInterval(iv))
+  })
+
+  return (
+    <div
+      style={{
+        "font-family": "var(--oc-font-mono)",
+        "font-size": "8px",
+        color: "rgba(80, 200, 120, 0.55)",
+        "line-height": "1.6",
+        "white-space": "nowrap",
+        overflow: "hidden",
+      }}
+    >
+      {lines().map((line) => (
+        <div style={{ "text-overflow": "ellipsis", overflow: "hidden" }}>{line}</div>
+      ))}
+    </div>
+  )
+}
 
 const SendButton: Component<{
   hasText: boolean
@@ -208,36 +268,38 @@ const EmptySession: Component = () => {
           "flex-direction": "column",
         }}
       >
-        {/* Cockpit viewport — ISS live feed with frame overlay */}
+        {/* Viewport — ISS feed, top third */}
         <div
           style={{
             position: "relative",
-            flex: "1",
-            "min-height": "0",
+            flex: "0 0 40%",
             overflow: "hidden",
           }}
         >
           <SpaceViewport />
         </div>
 
-        {/* Spaceteam controls strip */}
-        <SpaceteamPanel />
-
-        {/* COMMS terminal — textbox */}
+        {/* Control panel — fills remaining 2/3, textbox surrounded by controls */}
         <div
           style={{
-            "flex-shrink": "0",
-            background: "linear-gradient(180deg, #0a0d1a 0%, #080b15 100%)",
-            padding: "0",
+            flex: "1",
+            "min-height": "0",
+            background: "linear-gradient(180deg, #0c1020 0%, #080b15 100%)",
+            padding: "0 16px 12px",
+            display: "flex",
+            "flex-direction": "column",
+            "align-items": "center",
           }}
         >
-          {/* Status indicators */}
+          {/* COMMS TERMINAL label */}
           <div
             style={{
               display: "flex",
               "align-items": "center",
               "justify-content": "space-between",
-              padding: "4px 16px 2px",
+              width: "100%",
+              "max-width": "800px",
+              padding: "0 4px 6px",
             }}
           >
             <div style={{ display: "flex", "align-items": "center", gap: "16px" }}>
@@ -260,7 +322,7 @@ const EmptySession: Component = () => {
                     style={{
                       "font-family": "var(--oc-font-mono)",
                       "font-size": "9px",
-                      color: "rgba(140, 180, 220, 0.5)",
+                      color: "rgba(140, 180, 220, 0.6)",
                       "letter-spacing": "1px",
                       "text-transform": "uppercase",
                     }}
@@ -274,7 +336,7 @@ const EmptySession: Component = () => {
               style={{
                 "font-family": "var(--oc-font-mono)",
                 "font-size": "9px",
-                color: "rgba(140, 180, 220, 0.4)",
+                color: "rgba(140, 180, 220, 0.5)",
                 "letter-spacing": "1px",
               }}
             >
@@ -282,19 +344,44 @@ const EmptySession: Component = () => {
             </span>
           </div>
 
-          {/* Input */}
-          <div style={{ padding: "2px 12px 8px" }}>
+          {/* Grid: left controls | textbox | right controls */}
+          <div
+            style={{
+              display: "grid",
+              "grid-template-columns": "minmax(100px, 1fr) minmax(300px, 3fr) minmax(100px, 1fr)",
+              gap: "16px",
+              width: "100%",
+              "max-width": "800px",
+              "align-items": "center",
+            }}
+            aria-hidden="true"
+          >
+            {/* Left controls */}
             <div
               style={{
-                background: "rgba(10, 15, 30, 0.95)",
+                display: "flex",
+                "flex-direction": "column",
+                "align-items": "center",
+                gap: "12px",
+              }}
+            >
+              <ActionButton name="Turbo Encabulator" verb="HONK" />
+              <ToggleSwitch name="Flux Wobbler" />
+              <NumberDial name="Hypnobellows" />
+            </div>
+
+            {/* Center textbox */}
+            <div
+              style={{
+                background: "rgba(8, 12, 25, 0.95)",
                 border: focused()
                   ? "1px solid rgba(80, 160, 255, 0.5)"
                   : "1px solid rgba(80, 140, 200, 0.3)",
-                "border-radius": "8px",
+                "border-radius": "10px",
                 overflow: "hidden",
                 "box-shadow": focused()
-                  ? "0 0 24px rgba(60, 140, 220, 0.15), inset 0 1px 0 rgba(80, 140, 200, 0.15)"
-                  : "0 0 12px rgba(40, 100, 180, 0.06), inset 0 1px 0 rgba(80, 140, 200, 0.08)",
+                  ? "0 0 30px rgba(60, 140, 220, 0.2), inset 0 1px 0 rgba(80, 140, 200, 0.15)"
+                  : "0 0 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(80, 140, 200, 0.08)",
                 transition: "border-color 200ms ease, box-shadow 200ms ease",
               }}
             >
@@ -307,10 +394,10 @@ const EmptySession: Component = () => {
                 placeholder="Enter command..."
                 aria-label="Enter command"
                 disabled={sending()}
-                rows={2}
+                rows={3}
                 style={{
                   width: "100%",
-                  padding: "10px 14px",
+                  padding: "14px 16px",
                   background: "transparent",
                   border: "none",
                   color: "#c8ddf0",
@@ -326,15 +413,15 @@ const EmptySession: Component = () => {
                   display: "flex",
                   "align-items": "center",
                   "justify-content": "space-between",
-                  padding: "4px 10px",
-                  "border-top": "1px solid rgba(60, 100, 160, 0.12)",
+                  padding: "5px 12px",
+                  "border-top": "1px solid rgba(60, 100, 160, 0.15)",
                 }}
               >
                 <span
                   style={{
                     "font-size": "10px",
                     "font-family": "var(--oc-font-mono)",
-                    color: "rgba(100, 150, 200, 0.3)",
+                    color: "rgba(100, 150, 200, 0.35)",
                     "letter-spacing": "0.5px",
                   }}
                 >
@@ -343,6 +430,157 @@ const EmptySession: Component = () => {
                 <SendButton hasText={!!text().trim()} sending={sending()} onSend={handleSend} dark={true} />
               </div>
             </div>
+
+            {/* Right controls */}
+            <div
+              style={{
+                display: "flex",
+                "flex-direction": "column",
+                "align-items": "center",
+                gap: "12px",
+              }}
+            >
+              <Slider name="Radiocortex" />
+              <ActionButton name="Beeping Trapezoid" verb="EULOGIZE" />
+              <ToggleSwitch name="Tachyon Adapter" />
+            </div>
+          </div>
+
+          {/* Bottom controls strip */}
+          <div style={{ width: "100%", "max-width": "800px", "margin-top": "8px" }}>
+            <SpaceteamPanel />
+          </div>
+
+          {/* Dashboard instruments + Ship's log */}
+          <div
+            style={{
+              width: "100%",
+              "max-width": "800px",
+              "margin-top": "8px",
+              display: "grid",
+              "grid-template-columns": "1fr 1fr 1fr",
+              gap: "8px",
+            }}
+            aria-hidden="true"
+          >
+            {/* Left — Radar screen */}
+            <div
+              style={{
+                background: "#060a18",
+                border: "1px solid rgba(40, 100, 200, 0.25)",
+                "border-radius": "6px",
+                padding: "6px",
+                "min-height": "90px",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <div style={{
+                "font-family": "var(--oc-font-mono)",
+                "font-size": "7px",
+                color: "rgba(40, 180, 255, 0.4)",
+                "letter-spacing": "1.5px",
+                "text-transform": "uppercase",
+                "margin-bottom": "4px",
+              }}>NAV SYSTEM</div>
+              <svg viewBox="0 0 100 70" style={{ width: "100%", height: "auto" }}>
+                <circle cx="50" cy="38" r="28" fill="none" stroke="rgba(40, 180, 255, 0.12)" stroke-width="0.8" />
+                <circle cx="50" cy="38" r="14" fill="none" stroke="rgba(40, 180, 255, 0.08)" stroke-width="0.5" />
+                <line x1="22" y1="38" x2="78" y2="38" stroke="rgba(40, 180, 255, 0.08)" stroke-width="0.5" />
+                <line x1="50" y1="10" x2="50" y2="66" stroke="rgba(40, 180, 255, 0.08)" stroke-width="0.5" />
+                <circle cx="62" cy="30" r="2.5" fill="rgba(40, 200, 255, 0.5)" />
+                <circle cx="38" cy="48" r="1.8" fill="rgba(40, 200, 255, 0.3)" />
+                <circle cx="55" cy="52" r="1.5" fill="rgba(255, 200, 40, 0.4)" />
+              </svg>
+            </div>
+
+            {/* Center — Ship's log terminal */}
+            <div
+              style={{
+                background: "#060a18",
+                border: "1px solid rgba(40, 100, 200, 0.25)",
+                "border-radius": "6px",
+                padding: "6px",
+                "min-height": "90px",
+                overflow: "hidden",
+              }}
+            >
+              <div style={{
+                "font-family": "var(--oc-font-mono)",
+                "font-size": "7px",
+                color: "rgba(40, 180, 255, 0.4)",
+                "letter-spacing": "1.5px",
+                "text-transform": "uppercase",
+                "margin-bottom": "4px",
+              }}>SHIP LOG</div>
+              <ShipLog />
+            </div>
+
+            {/* Right — Gauges + red buttons */}
+            <div
+              style={{
+                background: "#060a18",
+                border: "1px solid rgba(40, 100, 200, 0.25)",
+                "border-radius": "6px",
+                padding: "6px",
+                "min-height": "90px",
+                overflow: "hidden",
+              }}
+            >
+              <div style={{
+                "font-family": "var(--oc-font-mono)",
+                "font-size": "7px",
+                color: "rgba(40, 180, 255, 0.4)",
+                "letter-spacing": "1.5px",
+                "text-transform": "uppercase",
+                "margin-bottom": "4px",
+              }}>AUX CONTROL</div>
+              <svg viewBox="0 0 100 70" style={{ width: "100%", height: "auto" }}>
+                {/* Gauges */}
+                <circle cx="25" cy="22" r="12" fill="none" stroke="rgba(80, 140, 200, 0.2)" stroke-width="0.8" />
+                <circle cx="25" cy="22" r="3" fill="rgba(80, 160, 220, 0.1)" />
+                <line x1="25" y1="22" x2="33" y2="16" stroke="rgba(200, 100, 100, 0.4)" stroke-width="0.8" />
+                <circle cx="75" cy="22" r="12" fill="none" stroke="rgba(80, 140, 200, 0.2)" stroke-width="0.8" />
+                <circle cx="75" cy="22" r="3" fill="rgba(80, 160, 220, 0.1)" />
+                <line x1="75" y1="22" x2="68" y2="14" stroke="rgba(200, 100, 100, 0.4)" stroke-width="0.8" />
+                {/* Red button grid */}
+                {[0,1,2,3].map((i) =>
+                  [0,1].map((j) => (
+                    <rect
+                      x={15 + i * 20}
+                      y={45 + j * 14}
+                      width="14"
+                      height="9"
+                      rx="1.5"
+                      fill={`rgba(200, 50, 50, ${0.2 + ((i + j) % 3) * 0.08})`}
+                      stroke="rgba(200, 50, 50, 0.15)"
+                      stroke-width="0.5"
+                    />
+                  ))
+                )}
+              </svg>
+            </div>
+          </div>
+
+          {/* Extra controls row */}
+          <div
+            style={{
+              width: "100%",
+              "max-width": "800px",
+              "margin-top": "8px",
+              display: "flex",
+              "align-items": "flex-end",
+              "justify-content": "space-around",
+              gap: "12px",
+              padding: "4px 0",
+            }}
+            aria-hidden="true"
+          >
+            <ActionButton name="Anti-Matter Toaster" verb="DEFENESTRATE" />
+            <Slider name="Warp Whistle Array" />
+            <ToggleSwitch name="Dark Energy Dimmer" />
+            <NumberDial name="Proton Sandwich Press" />
+            <ActionButton name="Subspatial Muffin Drive" verb="SNORKEL" />
           </div>
         </div>
       </div>

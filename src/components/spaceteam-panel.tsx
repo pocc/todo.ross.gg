@@ -38,7 +38,7 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
-const ActionButton: Component<{ name: string; verb: string }> = (props) => {
+export const ActionButton: Component<{ name: string; verb: string }> = (props) => {
   const [flash, setFlash] = createSignal(false)
 
   function handleClick() {
@@ -97,7 +97,7 @@ const ActionButton: Component<{ name: string; verb: string }> = (props) => {
   )
 }
 
-const ToggleSwitch: Component<{ name: string }> = (props) => {
+export const ToggleSwitch: Component<{ name: string }> = (props) => {
   const [on, setOn] = createSignal(Math.random() > 0.5)
 
   return (
@@ -148,7 +148,7 @@ const ToggleSwitch: Component<{ name: string }> = (props) => {
   )
 }
 
-const NumberDial: Component<{ name: string }> = (props) => {
+export const NumberDial: Component<{ name: string }> = (props) => {
   const [value, setValue] = createSignal(Math.floor(Math.random() * 10))
 
   return (
@@ -244,7 +244,7 @@ const NumberDial: Component<{ name: string }> = (props) => {
   )
 }
 
-const Slider: Component<{ name: string }> = (props) => {
+export const Slider: Component<{ name: string }> = (props) => {
   const [value, setValue] = createSignal(Math.floor(Math.random() * 10))
 
   onMount(() => {
@@ -319,7 +319,6 @@ export const SpaceteamPanel: Component = () => {
       { type: "slider" as const, name: n[2] },
       { type: "dial" as const, name: n[3] },
       { type: "button" as const, name: n[4], verb: v[1] },
-      { type: "toggle" as const, name: n[5] },
     ]
   }
 
