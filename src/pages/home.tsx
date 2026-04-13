@@ -372,7 +372,7 @@ export const HomePage: Component = () => {
                 "border-radius": "var(--oc-radius-md)",
                 border: "1px solid var(--oc-border-secondary)",
                 "font-family": "var(--oc-font-mono)",
-                "font-size": "11px",
+                "font-size": "12px",
                 color: "var(--oc-text-primary)",
                 "word-break": "break-all",
               }}
@@ -412,6 +412,7 @@ export const HomePage: Component = () => {
               onInput={(e) => setUrlInput(e.currentTarget.value)}
               onKeyDown={handleConnectKeyDown}
               placeholder="http://localhost:4096"
+              aria-label="Server URL"
               style={{
                 flex: "1",
                 padding: "8px 12px",
@@ -503,6 +504,7 @@ export const HomePage: Component = () => {
               onInput={(e) => setDirInput(e.currentTarget.value)}
               onKeyDown={handleDirKeyDown}
               placeholder="/path/to/project"
+              aria-label="Project directory path"
               style={{
                 flex: "1",
                 padding: "8px 12px",
@@ -622,7 +624,7 @@ export const HomePage: Component = () => {
                     <Show when={project.git?.branch}>
                       <span
                         style={{
-                          "font-size": "11px",
+                          "font-size": "12px",
                           padding: "2px 8px",
                           "border-radius": "var(--oc-radius-sm)",
                           background: "var(--oc-accent-primary)",
@@ -657,7 +659,7 @@ export const HomePage: Component = () => {
                     </span>
                     <span
                       style={{
-                        "font-size": "11px",
+                        "font-size": "12px",
                         color: "var(--oc-text-tertiary)",
                         "flex-shrink": "0",
                         "margin-left": "8px",

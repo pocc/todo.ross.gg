@@ -15,8 +15,8 @@
 
   --oc-text-primary: #ededef;
   --oc-text-secondary: #a0a0a8;
-  --oc-text-tertiary: #6e6e78;
-  --oc-text-disabled: #4a4a52;
+  --oc-text-tertiary: #8a8a96;
+  --oc-text-disabled: #5e5e68;
 
   --oc-border-primary: #2a2a2e;
   --oc-border-secondary: #222226;
@@ -40,7 +40,7 @@
   --oc-syntax-string: #98c379;
   --oc-syntax-number: #d19a66;
   --oc-syntax-function: #61afef;
-  --oc-syntax-comment: #5c6370;
+  --oc-syntax-comment: #7a7b85;
   --oc-syntax-variable: #e06c75;
 
   --oc-font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -69,8 +69,8 @@
 
   --oc-text-primary: #111113;
   --oc-text-secondary: #555560;
-  --oc-text-tertiary: #888892;
-  --oc-text-disabled: #bbbbcc;
+  --oc-text-tertiary: #666670;
+  --oc-text-disabled: #9999a8;
 
   --oc-border-primary: #dddde2;
   --oc-border-secondary: #e8e8ec;
@@ -100,6 +100,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+:focus-visible {
+  outline: 2px solid var(--oc-border-focus);
+  outline-offset: 2px;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -110,10 +115,20 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--oc-border-primary);
+  background: var(--oc-text-disabled);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--oc-text-tertiary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
