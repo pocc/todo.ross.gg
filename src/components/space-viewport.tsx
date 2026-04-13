@@ -27,6 +27,10 @@ function hsl(h: number, s: number, l: number, a = 1) {
   return `hsla(${h}, ${s}%, ${l}%, ${a})`
 }
 
+function randomBetween(min: number, max: number) {
+  return min + Math.random() * (max - min)
+}
+
 export const SpaceViewport: Component = () => {
   let canvasRef: HTMLCanvasElement | undefined
   let animFrame: number
@@ -39,10 +43,6 @@ export const SpaceViewport: Component = () => {
   const STAR_DRIFT = 0.08
   const BODY_MIN_INTERVAL = 12000
   const BODY_MAX_INTERVAL = 22000
-
-  function randomBetween(min: number, max: number) {
-    return min + Math.random() * (max - min)
-  }
 
   function initStars(w: number, h: number) {
     stars = []
@@ -62,13 +62,13 @@ export const SpaceViewport: Component = () => {
     const type = types[Math.floor(Math.random() * types.length)]
 
     const planetHues = [
-      { h: 25, s: 50, l: 55 },   // warm tan
-      { h: 210, s: 45, l: 50 },  // blue
-      { h: 15, s: 55, l: 45 },   // rust
-      { h: 45, s: 40, l: 60 },   // gold
-      { h: 280, s: 30, l: 45 },  // purple
-      { h: 160, s: 35, l: 40 },  // teal
-      { h: 340, s: 40, l: 50 },  // rose
+      { h: 25, s: 50, l: 55 },
+      { h: 210, s: 45, l: 50 },
+      { h: 15, s: 55, l: 45 },
+      { h: 45, s: 40, l: 60 },
+      { h: 280, s: 30, l: 45 },
+      { h: 160, s: 35, l: 40 },
+      { h: 340, s: 40, l: 50 },
     ]
 
     const ringHues = [
@@ -112,7 +112,6 @@ export const SpaceViewport: Component = () => {
       }
     }
 
-    // comet
     const angle = randomBetween(-0.3, 0.3)
     return {
       x: w + 40,
@@ -137,7 +136,6 @@ export const SpaceViewport: Component = () => {
     ctx.fillStyle = `rgba(220, 230, 255, ${alpha})`
     ctx.fill()
 
-    // subtle glow on bigger stars
     if (star.size > 1.2) {
       ctx.beginPath()
       ctx.arc(star.x, star.y, star.size * 2.5, 0, Math.PI * 2)
@@ -149,7 +147,6 @@ export const SpaceViewport: Component = () => {
   function drawPlanet(ctx: CanvasRenderingContext2D, body: CelestialBody, t: number) {
     const { x, y, size, color, hasRing, ringColor, ringTilt } = body
 
-    // shadow gradient for 3D feel
     const grad = ctx.createRadialGradient(
       x - size * 0.25, y - size * 0.2, size * 0.1,
       x, y, size
@@ -158,18 +155,13 @@ export const SpaceViewport: Component = () => {
     grad.addColorStop(0.7, color)
     grad.addColorStop(1, "rgba(0,0,0,0.7)")
 
-    // ring behind planet
-    if (hasRing && ringColor) {
-      drawRing(ctx, x, y, size, ringTilt, ringColor, false)
-    }
+    if (hasRing && ringColor) drawRing(ctx, x, y, size, ringTilt, ringColor, false)
 
-    // planet body
     ctx.beginPath()
     ctx.arc(x, y, size, 0, Math.PI * 2)
     ctx.fillStyle = grad
     ctx.fill()
 
-    // atmosphere glow
     const glowGrad = ctx.createRadialGradient(x, y, size * 0.9, x, y, size * 1.3)
     glowGrad.addColorStop(0, "rgba(150, 180, 255, 0)")
     glowGrad.addColorStop(0.5, "rgba(150, 180, 255, 0.04)")
@@ -179,10 +171,7 @@ export const SpaceViewport: Component = () => {
     ctx.fillStyle = glowGrad
     ctx.fill()
 
-    // ring in front of planet
-    if (hasRing && ringColor) {
-      drawRing(ctx, x, y, size, ringTilt, ringColor, true)
-    }
+    if (hasRing && ringColor) drawRing(ctx, x, y, size, ringTilt, ringColor, true)
   }
 
   function drawRing(
@@ -192,10 +181,8 @@ export const SpaceViewport: Component = () => {
   ) {
     ctx.save()
     ctx.translate(x, y)
-
     const innerRadius = planetSize * 1.3
     const outerRadius = planetSize * 1.9
-
     ctx.scale(1, tilt)
 
     if (front) {
@@ -230,7 +217,6 @@ export const SpaceViewport: Component = () => {
     ctx.fillStyle = grad
     ctx.fill()
 
-    // craters
     ctx.globalAlpha = 0.12
     const craterCount = Math.floor(size / 6)
     for (let i = 0; i < craterCount; i++) {
@@ -250,7 +236,6 @@ export const SpaceViewport: Component = () => {
   function drawComet(ctx: CanvasRenderingContext2D, body: CelestialBody) {
     const { x, y, size, cometTailLength = 120, cometAngle = 0 } = body
 
-    // tail
     const tailGrad = ctx.createLinearGradient(
       x, y,
       x + cometTailLength, y + cometTailLength * Math.sin(cometAngle)
@@ -275,7 +260,6 @@ export const SpaceViewport: Component = () => {
     ctx.fill()
     ctx.restore()
 
-    // nucleus glow
     const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, size * 5)
     glowGrad.addColorStop(0, "rgba(200, 230, 255, 0.6)")
     glowGrad.addColorStop(0.3, "rgba(180, 220, 255, 0.15)")
@@ -285,65 +269,13 @@ export const SpaceViewport: Component = () => {
     ctx.fillStyle = glowGrad
     ctx.fill()
 
-    // nucleus
     ctx.beginPath()
     ctx.arc(x, y, size, 0, Math.PI * 2)
     ctx.fillStyle = "rgba(230, 245, 255, 0.95)"
     ctx.fill()
   }
 
-  function render() {
-    const canvas = canvasRef
-    if (!canvas) return
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
-    const w = canvas.width
-    const h = canvas.height
-    time++
-
-    // deep space background
-    const bgGrad = ctx.createLinearGradient(0, 0, 0, h)
-    bgGrad.addColorStop(0, "#05060f")
-    bgGrad.addColorStop(0.5, "#080a18")
-    bgGrad.addColorStop(1, "#04050c")
-    ctx.fillStyle = bgGrad
-    ctx.fillRect(0, 0, w, h)
-
-    // faint nebula patches
-    drawNebula(ctx, w, h, time)
-
-    // stars — drift right to left slowly
-    for (const star of stars) {
-      star.x -= STAR_DRIFT * (0.3 + star.z * 0.7)
-      if (star.x < -5) {
-        star.x = w + 5
-        star.y = Math.random() * h
-      }
-      drawStar(ctx, star, time)
-    }
-
-    // celestial bodies
-    for (let i = bodies.length - 1; i >= 0; i--) {
-      const body = bodies[i]
-      body.x -= body.vx
-
-      if (body.type === "planet") drawPlanet(ctx, body, time)
-      else if (body.type === "moon") drawMoon(ctx, body)
-      else if (body.type === "comet") drawComet(ctx, body)
-
-      // remove when offscreen
-      const margin = body.type === "planet" ? body.size * 2.5 : body.size * 6
-      if (body.x < -margin) {
-        bodies.splice(i, 1)
-      }
-    }
-
-    animFrame = requestAnimationFrame(render)
-  }
-
   function drawNebula(ctx: CanvasRenderingContext2D, w: number, h: number, t: number) {
-    // subtle color patches that drift slowly
     const patches = [
       { cx: w * 0.2, cy: h * 0.3, r: 250, hue: 240, drift: 0.0002 },
       { cx: w * 0.8, cy: h * 0.6, r: 200, hue: 280, drift: 0.00015 },
@@ -363,6 +295,51 @@ export const SpaceViewport: Component = () => {
       ctx.fillStyle = grad
       ctx.fillRect(0, 0, w, h)
     }
+  }
+
+  function render() {
+    const canvas = canvasRef
+    if (!canvas) return
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+
+    const w = canvas.width
+    const h = canvas.height
+    time++
+
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, h)
+    bgGrad.addColorStop(0, "#05060f")
+    bgGrad.addColorStop(0.5, "#080a18")
+    bgGrad.addColorStop(1, "#04050c")
+    ctx.fillStyle = bgGrad
+    ctx.fillRect(0, 0, w, h)
+
+    drawNebula(ctx, w, h, time)
+
+    for (const star of stars) {
+      star.x -= STAR_DRIFT * (0.3 + star.z * 0.7)
+      if (star.x < -5) {
+        star.x = w + 5
+        star.y = Math.random() * h
+      }
+      drawStar(ctx, star, time)
+    }
+
+    for (let i = bodies.length - 1; i >= 0; i--) {
+      const body = bodies[i]
+      body.x -= body.vx
+
+      if (body.type === "planet") drawPlanet(ctx, body, time)
+      else if (body.type === "moon") drawMoon(ctx, body)
+      else if (body.type === "comet") drawComet(ctx, body)
+
+      const margin = body.type === "planet" ? body.size * 2.5 : body.size * 6
+      if (body.x < -margin) {
+        bodies.splice(i, 1)
+      }
+    }
+
+    animFrame = requestAnimationFrame(render)
   }
 
   function scheduleNextBody(w: number, h: number) {
@@ -392,16 +369,13 @@ export const SpaceViewport: Component = () => {
     const logicalW = canvas.width / window.devicePixelRatio
     const logicalH = canvas.height / window.devicePixelRatio
 
-    // spawn initial body after short delay
     setTimeout(() => {
       if (!alive) return
       bodies.push(spawnBody(logicalW, logicalH))
     }, 3000)
 
     scheduleNextBody(logicalW, logicalH)
-
     animFrame = requestAnimationFrame(render)
-
     window.addEventListener("resize", resize)
 
     onCleanup(() => {
@@ -411,15 +385,175 @@ export const SpaceViewport: Component = () => {
     })
   })
 
+  // Cockpit frame as SVG overlay with 3 viewport cutouts
+  // Coordinates are in percentages mapped to viewBox 0 0 1000 600
+  const framePath = `
+    M 0 0 H 1000 V 600 H 0 Z
+    M 60 50 L 320 80 L 350 400 L 40 350 Z
+    M 370 30 L 630 30 L 680 400 L 320 400 Z
+    M 680 80 L 940 50 L 960 350 L 650 400 Z
+  `
+
   return (
-    <canvas
-      ref={canvasRef}
+    <div
       style={{
-        position: "absolute",
-        inset: "0",
+        position: "relative",
         width: "100%",
         height: "100%",
+        overflow: "hidden",
+        background: "#05060f",
       }}
-    />
+      aria-hidden="true"
+    >
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: "absolute",
+          inset: "0",
+          width: "100%",
+          height: "100%",
+        }}
+      />
+
+      {/* Cockpit frame overlay */}
+      <svg
+        viewBox="0 0 1000 600"
+        preserveAspectRatio="none"
+        style={{
+          position: "absolute",
+          inset: "0",
+          width: "100%",
+          height: "100%",
+          "pointer-events": "none",
+        }}
+      >
+        {/* Main frame — dark hull with viewport cutouts */}
+        <path
+          d={framePath}
+          fill="#0c0f1a"
+          fill-rule="evenodd"
+        />
+
+        {/* Viewport edge highlights — subtle glow along window frames */}
+        {/* Left viewport */}
+        <polygon
+          points="60,50 320,80 350,400 40,350"
+          fill="none"
+          stroke="rgba(80, 140, 200, 0.2)"
+          stroke-width="2"
+        />
+        {/* Center viewport */}
+        <polygon
+          points="370,30 630,30 680,400 320,400"
+          fill="none"
+          stroke="rgba(80, 140, 200, 0.25)"
+          stroke-width="2.5"
+        />
+        {/* Right viewport */}
+        <polygon
+          points="680,80 940,50 960,350 650,400"
+          fill="none"
+          stroke="rgba(80, 140, 200, 0.2)"
+          stroke-width="2"
+        />
+
+        {/* Structural beam highlights — bright edges on the frame dividers */}
+        <line x1="320" y1="80" x2="320" y2="400" stroke="rgba(100, 160, 220, 0.12)" stroke-width="1" />
+        <line x1="350" y1="400" x2="320" y2="400" stroke="rgba(100, 160, 220, 0.1)" stroke-width="1" />
+        <line x1="680" y1="80" x2="650" y2="400" stroke="rgba(100, 160, 220, 0.12)" stroke-width="1" />
+        <line x1="680" y1="400" x2="650" y2="400" stroke="rgba(100, 160, 220, 0.1)" stroke-width="1" />
+
+        {/* Rivet/bolt dots at beam intersections */}
+        {[
+          [60, 50], [320, 80], [350, 400], [40, 350],
+          [370, 30], [630, 30], [680, 400], [320, 400],
+          [680, 80], [940, 50], [960, 350], [650, 400],
+        ].map(([cx, cy]) => (
+          <>
+            <circle cx={cx} cy={cy} r="4" fill="#1a1f30" />
+            <circle cx={cx} cy={cy} r="2.5" fill="#0c0f1a" />
+            <circle cx={cx} cy={cy} r="1.2" fill="rgba(100, 160, 220, 0.15)" />
+          </>
+        ))}
+
+        {/* Roof label */}
+        <text
+          x="500" y="20"
+          text-anchor="middle"
+          font-family="var(--oc-font-mono)"
+          font-size="9"
+          fill="rgba(100, 160, 220, 0.2)"
+          letter-spacing="3"
+        >
+          HULL INTEGRITY 98.7%
+        </text>
+      </svg>
+
+      {/* HUD text overlays positioned inside viewport panes */}
+      <div
+        style={{
+          position: "absolute",
+          inset: "0",
+          "pointer-events": "none",
+          "font-family": "var(--oc-font-mono)",
+        }}
+      >
+        {/* Top-left HUD — inside left viewport */}
+        <div
+          style={{
+            position: "absolute",
+            top: "12%",
+            left: "5%",
+            "font-size": "10px",
+            color: "rgba(100, 180, 255, 0.35)",
+            "letter-spacing": "1.5px",
+            "text-transform": "uppercase",
+            "line-height": "1.8",
+          }}
+        >
+          <div>SYS STATUS: NOMINAL</div>
+          <div>NAV: CRUISING</div>
+        </div>
+
+        {/* Top-right HUD — inside right viewport */}
+        <div
+          style={{
+            position: "absolute",
+            top: "12%",
+            right: "5%",
+            "font-size": "10px",
+            color: "rgba(100, 180, 255, 0.35)",
+            "letter-spacing": "1.5px",
+            "text-transform": "uppercase",
+            "text-align": "right",
+            "line-height": "1.8",
+          }}
+        >
+          <div>SECTOR 7G-ROSS</div>
+          <div>WARP 0.2c</div>
+        </div>
+      </div>
+
+      {/* Scanline effect */}
+      <div
+        style={{
+          position: "absolute",
+          inset: "0",
+          "pointer-events": "none",
+          background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 4px)",
+          opacity: "0.4",
+        }}
+      />
+
+      {/* Vignette */}
+      <div
+        style={{
+          position: "absolute",
+          inset: "0",
+          "pointer-events": "none",
+          "box-shadow": "inset 0 0 100px rgba(0,0,0,0.5)",
+        }}
+      />
+    </div>
   )
 }

@@ -9,6 +9,7 @@ import { Composer } from "~/pages/session/composer"
 import { ReviewPanel } from "~/pages/session/review-panel"
 import { SessionHeader } from "~/pages/session/session-header"
 import { SpaceViewport } from "~/components/space-viewport"
+import { SpaceteamPanel } from "~/components/spaceteam-panel"
 import type { Session, MessagePart } from "~/lib/types"
 
 const EmptySession: Component = () => {
@@ -46,7 +47,6 @@ const EmptySession: Component = () => {
   return (
     <div
       style={{
-        position: "relative",
         width: "100%",
         height: "100%",
         overflow: "hidden",
@@ -55,7 +55,7 @@ const EmptySession: Component = () => {
         "flex-direction": "column",
       }}
     >
-      {/* Viewport area — the space scene */}
+      {/* Cockpit viewport — space scene with frame overlay */}
       <div
         style={{
           position: "relative",
@@ -65,93 +65,27 @@ const EmptySession: Component = () => {
         }}
       >
         <SpaceViewport />
-
-        {/* Viewport frame overlay — subtle vignette like a ship window */}
-        <div
-          style={{
-            position: "absolute",
-            inset: "0",
-            "pointer-events": "none",
-            "box-shadow": "inset 0 0 80px rgba(0,0,0,0.6), inset 0 0 20px rgba(0,0,0,0.3)",
-            "border-bottom": "1px solid rgba(80, 140, 200, 0.15)",
-          }}
-        />
-
-        {/* HUD overlays */}
-        <div
-          style={{
-            position: "absolute",
-            top: "16px",
-            left: "20px",
-            "pointer-events": "none",
-            "font-family": "var(--oc-font-mono)",
-            "font-size": "10px",
-            color: "rgba(100, 180, 255, 0.35)",
-            "letter-spacing": "1.5px",
-            "text-transform": "uppercase",
-            "line-height": "1.8",
-          }}
-        >
-          <div>SYS STATUS: NOMINAL</div>
-          <div>NAV: CRUISING</div>
-        </div>
-
-        <div
-          style={{
-            position: "absolute",
-            top: "16px",
-            right: "20px",
-            "pointer-events": "none",
-            "font-family": "var(--oc-font-mono)",
-            "font-size": "10px",
-            color: "rgba(100, 180, 255, 0.35)",
-            "letter-spacing": "1.5px",
-            "text-transform": "uppercase",
-            "text-align": "right",
-            "line-height": "1.8",
-          }}
-        >
-          <div>SECTOR 7G-ROSS</div>
-          <div>WARP 0.2c</div>
-        </div>
-
-        {/* Thin scanline effect */}
-        <div
-          style={{
-            position: "absolute",
-            inset: "0",
-            "pointer-events": "none",
-            background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 4px)",
-            opacity: "0.5",
-          }}
-        />
       </div>
 
-      {/* Control panel — bottom section */}
+      {/* Spaceteam controls strip */}
+      <SpaceteamPanel />
+
+      {/* COMMS terminal — textbox */}
       <div
         style={{
           "flex-shrink": "0",
           background: "linear-gradient(180deg, #0a0d1a 0%, #080b15 100%)",
-          "border-top": "1px solid rgba(80, 140, 200, 0.2)",
           padding: "0",
           position: "relative",
         }}
       >
-        {/* Panel decoration strip */}
-        <div
-          style={{
-            height: "2px",
-            background: "linear-gradient(90deg, transparent 0%, rgba(60, 130, 200, 0.3) 20%, rgba(60, 130, 200, 0.5) 50%, rgba(60, 130, 200, 0.3) 80%, transparent 100%)",
-          }}
-        />
-
         {/* Status indicators row */}
         <div
           style={{
             display: "flex",
             "align-items": "center",
             "justify-content": "space-between",
-            padding: "8px 16px 4px",
+            padding: "6px 16px 4px",
           }}
         >
           <div
@@ -203,7 +137,7 @@ const EmptySession: Component = () => {
         </div>
 
         {/* Input area */}
-        <div style={{ padding: "6px 12px 12px" }}>
+        <div style={{ padding: "4px 12px 12px" }}>
           <div
             style={{
               background: "rgba(15, 20, 35, 0.9)",
@@ -225,6 +159,7 @@ const EmptySession: Component = () => {
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               placeholder="Enter command..."
+              aria-label="Enter command"
               disabled={sending()}
               rows={3}
               style={{
