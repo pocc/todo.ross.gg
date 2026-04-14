@@ -19,6 +19,7 @@ interface LayoutContextState {
   setTerminalHeight: (n: number) => void
   setReviewPanelWidth: (n: number) => void
   setFileTreeWidth: (n: number) => void
+  setActiveTab: (tab: "todos" | "chats") => void
   getScrollPosition: (sessionId: string) => number
   setScrollPosition: (sessionId: string, position: number) => void
 }
@@ -34,13 +35,14 @@ const DEFAULT_LAYOUT: LayoutState = {
   reviewPanelVisible: false,
   fileTreeWidth: 240,
   fileTreeVisible: false,
+  activeTab: "chats" as const,
 }
 
 export const LayoutProvider: ParentComponent = (props) => {
   const storage = persist<LayoutState>("layout.v2", DEFAULT_LAYOUT)
   const scrollCache = createLRUCache<number>("layout.scroll", 50)
 
-  const [layout, setLayout] = createStore<LayoutState>(storage.get())
+  const [layout, setLayout] = createStore<LayoutState>({ ...DEFAULT_LAYOUT, ...storage.get() })
 
   createEffect(() => {
     storage.set({ ...layout })
@@ -78,6 +80,10 @@ export const LayoutProvider: ParentComponent = (props) => {
     setLayout("fileTreeWidth", n)
   }
 
+  function setActiveTab(tab: "todos" | "chats") {
+    setLayout("activeTab", tab)
+  }
+
   function getScrollPosition(sessionId: string): number {
     return scrollCache.get(sessionId) ?? 0
   }
@@ -98,6 +104,7 @@ export const LayoutProvider: ParentComponent = (props) => {
     setTerminalHeight,
     setReviewPanelWidth,
     setFileTreeWidth,
+    setActiveTab,
     getScrollPosition,
     setScrollPosition,
   }
