@@ -1,24 +1,20 @@
 import { Component, createSignal, Show, For } from "solid-js"
 import { useNavigate, useParams } from "@solidjs/router"
-import { useServer } from "~/context/server"
 import { useGlobalSync } from "~/context/global-sync"
 import { useLayout } from "~/context/layout"
 import { useTheme } from "~/ui/theme"
 import { Button } from "~/ui/components/button"
-import { Spinner } from "~/ui/components/spinner"
 import { ThemeToggle } from "~/components/theme-toggle"
 
 export const Sidebar: Component = () => {
   const params = useParams<{ dir: string; id?: string }>()
   const navigate = useNavigate()
-  const server = useServer()
   const globalSync = useGlobalSync()
   const layout = useLayout()
   const theme = useTheme()
 
   const isDark = () => theme.resolvedMode() === "dark"
   const [filter, setFilter] = createSignal("")
-  const [creating, setCreating] = createSignal(false)
 
   const directory = () => {
     try {
@@ -46,17 +42,8 @@ export const Sidebar: Component = () => {
     )
   }
 
-  async function handleNewSession() {
-    setCreating(true)
-    try {
-      server.sdk.setDirectory(directory())
-      const session = await server.sdk.createSession({})
-      navigate(`/${params.dir}/session/${session.id}`)
-    } catch {
-      // session creation failed
-    } finally {
-      setCreating(false)
-    }
+  function handleNewSession() {
+    navigate(`/${params.dir}/session`)
   }
 
   function handleNavigateSession(sessionId: string) {
@@ -159,7 +146,6 @@ export const Sidebar: Component = () => {
         <Button
           variant="primary"
           size="sm"
-          loading={creating()}
           onClick={handleNewSession}
         >
           <svg
