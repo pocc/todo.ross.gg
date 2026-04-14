@@ -236,6 +236,7 @@ export interface LayoutState {
   reviewPanelVisible: boolean
   fileTreeWidth: number
   fileTreeVisible: boolean
+  activeTab: "todos" | "chats"
 }
 
 export interface Settings {

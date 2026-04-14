@@ -4,6 +4,34 @@ import { useServer } from "~/context/server"
 import { useGlobalSync } from "~/context/global-sync"
 import { useLayout } from "~/context/layout"
 import { Sidebar } from "~/pages/layout/sidebar"
+import { TodosPage } from "~/pages/todos"
+
+const TabBarButton: Component<{ label: string; active: boolean; onClick: () => void }> = (props) => (
+  <button
+    onClick={props.onClick}
+    style={{
+      padding: "6px 16px",
+      "font-size": "13px",
+      "font-family": "var(--oc-font-sans)",
+      "font-weight": "500",
+      color: props.active ? "var(--oc-text-primary)" : "var(--oc-text-tertiary)",
+      background: "transparent",
+      border: "none",
+      "border-bottom": props.active ? "2px solid var(--oc-accent-primary)" : "2px solid transparent",
+      cursor: "pointer",
+      transition: "color 150ms ease, border-color 150ms ease",
+      outline: "none",
+    }}
+    onMouseEnter={(e) => {
+      if (!props.active) e.currentTarget.style.color = "var(--oc-text-secondary)"
+    }}
+    onMouseLeave={(e) => {
+      if (!props.active) e.currentTarget.style.color = "var(--oc-text-tertiary)"
+    }}
+  >
+    {props.label}
+  </button>
+)
 
 export const AppLayout: Component<{ children?: any }> = (props) => {
   const params = useParams<{ dir: string }>()
@@ -222,6 +250,29 @@ export const AppLayout: Component<{ children?: any }> = (props) => {
           overflow: "hidden",
         }}
       >
+        {/* Tab bar */}
+        <div
+          style={{
+            display: "flex",
+            "align-items": "center",
+            "border-bottom": "1px solid var(--oc-border-primary)",
+            "flex-shrink": "0",
+            background: "var(--oc-bg-secondary)",
+            padding: "0 8px",
+          }}
+        >
+          <TabBarButton
+            label="Todos"
+            active={layout.layout.activeTab === "todos"}
+            onClick={() => layout.setActiveTab("todos")}
+          />
+          <TabBarButton
+            label="Chats"
+            active={layout.layout.activeTab === "chats"}
+            onClick={() => layout.setActiveTab("chats")}
+          />
+        </div>
+
         {/* Main content */}
         <div
           style={{
@@ -230,7 +281,9 @@ export const AppLayout: Component<{ children?: any }> = (props) => {
             overflow: "auto",
           }}
         >
-          {props.children}
+          <Show when={layout.layout.activeTab === "chats"} fallback={<TodosPage />}>
+            {props.children}
+          </Show>
         </div>
 
         {/* Terminal panel */}
