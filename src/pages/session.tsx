@@ -4,11 +4,13 @@ import { SyncProvider, useSync } from "~/context/sync"
 import { useServer } from "~/context/server"
 import { useLayout } from "~/context/layout"
 import { useGlobalSync } from "~/context/global-sync"
+import { useModels } from "~/context/models"
 import { useTheme } from "~/ui/theme"
 import { MessageTimeline } from "~/pages/session/message-timeline"
 import { Composer } from "~/pages/session/composer"
 import { ReviewPanel } from "~/pages/session/review-panel"
 import { SessionHeader } from "~/pages/session/session-header"
+import { SelectModelDialog } from "~/components/dialog-select-model"
 import { SpaceViewport } from "~/components/space-viewport"
 import { SpaceteamPanel, ActionButton, ToggleSwitch, NumberDial, Slider } from "~/components/spaceteam-panel"
 import type { Session, MessagePart } from "~/lib/types"
@@ -135,14 +137,41 @@ const EmptySession: Component = () => {
   const navigate = useNavigate()
   const server = useServer()
   const theme = useTheme()
+  const models = useModels()
   const [text, setText] = createSignal("")
   const [sending, setSending] = createSignal(false)
   const [focused, setFocused] = createSignal(false)
+  const [selectedProvider, setSelectedProvider] = createSignal<string | null>(null)
+  const [selectedModel, setSelectedModel] = createSignal<string | null>(null)
+  const [modelDialogOpen, setModelDialogOpen] = createSignal(false)
   const directory = () => {
     try { return atob(params.dir) } catch { return "" }
   }
 
   const isDark = () => theme.resolvedMode() === "dark"
+
+  // Auto-select first available model when providers load
+  createEffect(() => {
+    const available = models.getAvailableModels()
+    if (available.length > 0 && !selectedModel()) {
+      setSelectedProvider(available[0].provider)
+      setSelectedModel(available[0].model)
+    }
+  })
+
+  function handleModelSelect(provider: string, model: string) {
+    setSelectedProvider(provider)
+    setSelectedModel(model)
+  }
+
+  const modelDisplayName = () => {
+    const provider = selectedProvider()
+    const model = selectedModel()
+    if (!provider || !model) return "Select model"
+    const available = models.getAvailableModels()
+    const found = available.find((m) => m.provider === provider && m.model === model)
+    return found?.name ?? model
+  }
 
   async function handleSend() {
     const msg = text().trim()
@@ -150,7 +179,10 @@ const EmptySession: Component = () => {
     setSending(true)
     try {
       server.sdk.setDirectory(directory())
-      const session = await server.sdk.createSession({})
+      const session = await server.sdk.createSession({
+        provider: selectedProvider() ?? undefined,
+        model: selectedModel() ?? undefined,
+      })
       await server.sdk.sendMessage(session.id, [{ type: "text", text: msg }])
       navigate(`/${params.dir}/session/${session.id}`)
     } catch {
@@ -254,6 +286,46 @@ const EmptySession: Component = () => {
               <SendButton hasText={!!text().trim()} sending={sending()} onSend={handleSend} dark={false} />
             </div>
           </div>
+          {/* Model selector */}
+          <div
+            style={{
+              display: "flex",
+              "align-items": "center",
+              "margin-top": "8px",
+              padding: "0 4px",
+            }}
+          >
+            <button
+              onClick={() => setModelDialogOpen(true)}
+              style={{
+                "font-size": "12px",
+                color: "var(--oc-text-tertiary)",
+                "font-family": "var(--oc-font-mono)",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: "2px 4px",
+                "border-radius": "var(--oc-radius-sm)",
+                transition: "color 100ms ease, background 100ms ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "var(--oc-text-primary)"
+                e.currentTarget.style.background = "var(--oc-bg-hover)"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "var(--oc-text-tertiary)"
+                e.currentTarget.style.background = "none"
+              }}
+              title="Click to change model"
+            >
+              {modelDisplayName()}
+            </button>
+          </div>
+          <SelectModelDialog
+            open={modelDialogOpen()}
+            onOpenChange={setModelDialogOpen}
+            onSelect={handleModelSelect}
+          />
         </div>
       </div>
     }>
@@ -442,6 +514,33 @@ const EmptySession: Component = () => {
                 >
                   ENTER transmit &middot; SHIFT+ENTER newline
                 </span>
+                <button
+                  onClick={() => setModelDialogOpen(true)}
+                  style={{
+                    "font-size": "10px",
+                    "font-family": "var(--oc-font-mono)",
+                    color: "var(--oc-cockpit-text)",
+                    background: "rgba(40, 70, 120, 0.25)",
+                    border: "1px solid var(--oc-cockpit-border-faint)",
+                    "border-radius": "4px",
+                    padding: "3px 8px",
+                    cursor: "pointer",
+                    "letter-spacing": "0.5px",
+                    "white-space": "nowrap",
+                    transition: "background 100ms ease, border-color 100ms ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(50, 90, 150, 0.35)"
+                    e.currentTarget.style.borderColor = "var(--oc-cockpit-border)"
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(40, 70, 120, 0.25)"
+                    e.currentTarget.style.borderColor = "var(--oc-cockpit-border-faint)"
+                  }}
+                  title="Click to change model"
+                >
+                  {modelDisplayName()}
+                </button>
                 <SendButton hasText={!!text().trim()} sending={sending()} onSend={handleSend} dark={true} />
               </div>
             </div>
@@ -462,6 +561,12 @@ const EmptySession: Component = () => {
               <ToggleSwitch name="Tachyon Adapter" />
             </div>
           </div>
+
+          <SelectModelDialog
+            open={modelDialogOpen()}
+            onOpenChange={setModelDialogOpen}
+            onSelect={handleModelSelect}
+          />
 
           {/* Bottom controls strip */}
           <div style={{ width: "100%", "max-width": "900px", "margin-top": "8px" }}>

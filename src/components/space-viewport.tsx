@@ -1,8 +1,9 @@
 import { Component } from "solid-js"
 
 export const SpaceViewport: Component = () => {
-  // NASA ISS HD Earth Viewing — confirmed working stream
-  const streamUrl = "https://www.youtube.com/embed/zPH5KtjJFaQ?autoplay=1&mute=1&showinfo=0&rel=0&controls=0&modestbranding=1&playsinline=1"
+  // "All Alone in the Night" — ISS Earth timelapse, loops continuously
+  const videoId = "FG0fTKAqZ5g"
+  const streamUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&loop=1&playlist=${videoId}&start=60`
 
   return (
     <div
@@ -93,12 +94,9 @@ export const SpaceViewport: Component = () => {
           </linearGradient>
         </defs>
 
-        {/* Outer frame */}
-        <rect x="0" y="0" width="1000" height="500" fill="url(#frameGrad)" />
-
-        {/* Main viewport cutout */}
-        <rect x="15" y="12" width="970" height="476" fill="black" fill-opacity="1" />
-        <rect x="15" y="12" width="970" height="476" fill="transparent" />
+        {/* Top and bottom frame strips only — center is open for iframe */}
+        <rect x="0" y="0" width="1000" height="12" fill="url(#frameGrad)" />
+        <rect x="0" y="488" width="1000" height="12" fill="url(#frameGrad)" />
 
         {/* Left beam — curved arc from top-left inward to bottom-center */}
         <path
@@ -116,11 +114,11 @@ export const SpaceViewport: Component = () => {
         <path d="M785,12 Q635,250 595,488" fill="none" stroke="rgba(100, 160, 220, 0.15)" stroke-width="1.5" />
 
         {/* Frame border highlights */}
-        <rect x="15" y="12" width="970" height="476" fill="none" stroke="rgba(80, 140, 200, 0.2)" stroke-width="2" />
+        <rect x="0" y="12" width="1000" height="476" fill="none" stroke="rgba(80, 140, 200, 0.2)" stroke-width="2" />
 
         {/* Rivets at corners and beam joints */}
         {[
-          [15, 12], [985, 12], [15, 488], [985, 488],
+          [0, 12], [1000, 12], [0, 488], [1000, 488],
           [215, 12], [785, 12],
           [405, 488], [595, 488],
           [500, 8],

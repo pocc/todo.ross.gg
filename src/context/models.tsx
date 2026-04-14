@@ -26,8 +26,27 @@ export const ModelsProvider: ParentComponent = (props) => {
     try {
       const result = await server.sdk.getProviders()
       const parsed: Record<string, ProviderConfig> = {}
-      for (const [key, value] of Object.entries(result.providers)) {
-        parsed[key] = value as ProviderConfig
+
+      // API may return providers as an array or object
+      const entries = Array.isArray(result.providers)
+        ? result.providers.map((p: any) => [p.id, p] as const)
+        : Object.entries(result.providers)
+
+      for (const [key, value] of entries) {
+        const raw = value as any
+        // API returns models as an object keyed by ID; normalize to array
+        const modelsRaw = raw.models
+        const modelsArray = Array.isArray(modelsRaw)
+          ? modelsRaw
+          : modelsRaw && typeof modelsRaw === "object"
+            ? Object.values(modelsRaw).map((m: any) => ({ id: m.id, name: m.name }))
+            : []
+        parsed[key as string] = {
+          id: raw.id ?? (key as string),
+          name: raw.name ?? (key as string),
+          api: raw.api,
+          models: modelsArray,
+        }
       }
       setProviders(reconcile(parsed))
     } catch {
@@ -43,14 +62,13 @@ export const ModelsProvider: ParentComponent = (props) => {
   function getAvailableModels(): Array<{ provider: string; model: string; name: string }> {
     const result: Array<{ provider: string; model: string; name: string }> = []
     for (const [providerKey, config] of Object.entries(providers)) {
-      if (config.models) {
-        for (const m of config.models) {
-          result.push({
-            provider: providerKey,
-            model: m.id,
-            name: `${config.name} / ${m.name}`,
-          })
-        }
+      const models = Array.isArray(config.models) ? config.models : []
+      for (const m of models) {
+        result.push({
+          provider: providerKey,
+          model: m.id,
+          name: `${config.name} / ${m.name}`,
+        })
       }
     }
     return result

@@ -1,6 +1,7 @@
 import { Component, createSignal, Show, For, onMount } from "solid-js"
 import type { MessagePart } from "~/lib/types"
 import { Button } from "~/ui/components/button"
+import { SelectModelDialog } from "~/components/dialog-select-model"
 
 interface AttachedFile {
   name: string
@@ -12,12 +13,14 @@ export interface ComposerProps {
   modelName: string
   onSubmit: (parts: MessagePart[]) => void
   onAbort: () => void
+  onModelSelect: (provider: string, model: string) => void
   isRunning: boolean
 }
 
 export const Composer: Component<ComposerProps> = (props) => {
   const [text, setText] = createSignal("")
   const [files, setFiles] = createSignal<AttachedFile[]>([])
+  const [modelDialogOpen, setModelDialogOpen] = createSignal(false)
   let textareaRef: HTMLTextAreaElement | undefined
 
   function autoResize() {
@@ -253,15 +256,36 @@ export const Composer: Component<ComposerProps> = (props) => {
           padding: "0 4px",
         }}
       >
-        <span
+        <button
+          onClick={() => setModelDialogOpen(true)}
           style={{
             "font-size": "12px",
             color: "var(--oc-text-tertiary)",
             "font-family": "var(--oc-font-mono)",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: "2px 4px",
+            "border-radius": "var(--oc-radius-sm)",
+            transition: "color 100ms ease, background 100ms ease",
           }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "var(--oc-text-primary)"
+            e.currentTarget.style.background = "var(--oc-bg-hover)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "var(--oc-text-tertiary)"
+            e.currentTarget.style.background = "none"
+          }}
+          title="Click to change model"
         >
           {props.modelName || "No model selected"}
-        </span>
+        </button>
+        <SelectModelDialog
+          open={modelDialogOpen()}
+          onOpenChange={setModelDialogOpen}
+          onSelect={props.onModelSelect}
+        />
         <span
           style={{
             "font-size": "12px",
